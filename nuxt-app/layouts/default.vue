@@ -1,9 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <UContainer>
-      <header class="bg-white border-b border-gray-200">
-        <div class="flex justify-between items-center h-16 px-4">
+      <header class="bg-white border-b border-gray-200 shadow-md">
+        <div class="flex justify-between items-center h-16 px-4 mx-20">
           <NuxtLink to="/" class="flex items-center space-x-2">
             <UIcon name="i-heroicons-academic-cap" class="w-8 h-8 text-primary-600" />
             <h1 class="text-xl font-bold text-gray-900">AI Learning Hub</h1>
@@ -18,7 +16,7 @@
                 :to="item.to"
                 :variant="$route.path === item.to ? 'solid' : 'ghost'"
                 :icon="item.icon"
-                size="sm"
+                size="md"
               >
                 {{ item.label }}
               </UButton>
@@ -45,8 +43,6 @@
           </div>
         </div>
       </header>
-    </UContainer>
-
     <!-- Main Content -->
     <main class="py-8">
       <UContainer>
@@ -63,15 +59,14 @@ const user = {
     name: 'John Doe',
     avatar: 'https://via.placeholder.com/150'
 }
-const isAuthenticated = ref(true)
+const isAuthenticated = ref(true) // Simulate authentication state
 const logout = async () => {
   console.log('Logging out...')
 }
 
 const navigation = [
   { label: 'Dashboard', to: '/', icon: 'i-heroicons-home' },
-  { label: 'Request Course', to: '/courses/request', icon: 'i-heroicons-plus' },
-  { label: 'My Courses', to: '/courses', icon: 'i-heroicons-book-open' },
+  { label: 'Courses', to: '/courses', icon: 'i-heroicons-book-open' },
   { label: 'Quizzes', to: '/quiz', icon: 'i-heroicons-academic-cap' },
   { label: 'Schedule', to: '/schedule', icon: 'i-heroicons-calendar' }
 ]
