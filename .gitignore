@@ -1,0 +1,55 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+build/
+**/build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.*
+**/.env
+**/.env.*
+
+# IDEs
+.vscode/
+.idea/
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+docker-compose.dev.yml
+
+# Coverage
+coverage/
+**/coverage/
+
+# Misc
+*.tgz
+*.lock-wscript
+*.tsbuildinfo
+
+# Test output
+jest-coverage/
+test-results/
+
+# CI/CD
+.env.local
+.env.test
+.env.production
+
+# Optional: ignore compiled proto files if using gRPC
+*.pb.*
