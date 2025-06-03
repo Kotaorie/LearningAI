@@ -21,7 +21,7 @@ LearningAI est une plateforme web d'apprentissage assisté par IA. Elle génère
 1. **Cloner le repo**
 
 ```bash
-git clone https://github.com/<user>/LearningAI.git
+git clone https://github.com/Kotaorie/LearningAI.git
 cd LearningAI
 ```
 
