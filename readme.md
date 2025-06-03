@@ -31,8 +31,8 @@ docker-compose up --build
 ```
 
 Accès :
-    - GraphQL Playground : http://localhost:3000/graphql
-    - RabbitMQ (admin UI) : http://localhost:15672
+ - GraphQL Playground : http://localhost:3000/graphql
+ - RabbitMQ (admin UI) : http://localhost:15672
 
 ### ✅ Conventions de commit
 
