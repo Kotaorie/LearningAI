@@ -49,12 +49,14 @@ Chaque PR doit être validée par un membre de l'équipe + passer la CI avant d'
 
 ### 📁 Structure (exemple)
 
-/gateway         → point d'entrée GraphQL
-/user-service    → gestion des utilisateurs et auth
-/profile-service → niveau, objectifs, disponibilités
-/scheduler       → création du planning hebdo
-/course-gen      → demande de cours à l'IA via MQ
-/worker-ia       → traite la queue RabbitMQ (OpenAI)
+ - /nuxt-app             → front end de l'application 
+
+ - /back/gateway         → point d'entrée GraphQL
+ - /back/user-service    → gestion des utilisateurs et auth
+ - /back/profile-service → niveau, objectifs, disponibilités
+ - /back/scheduler       → création du planning hebdo
+ - /back/course-gen      → demande de cours à l'IA via MQ
+ - /back/worker-ia       → traite la queue RabbitMQ (OpenAI)
 
 ### 👥 Équipe
 
