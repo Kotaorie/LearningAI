@@ -58,9 +58,9 @@ Chaque PR doit être validée par un membre de l'équipe + passer la CI avant d'
 
 ### 👥 Équipe
 
-    Alice — frontend, gateway, CI/CD
+    Nicolas Servary — dev
 
-    Bob — microservices, tests, RabbitMQ
+    Tancrede Castet — dev
 
 ### 📄 Licence
 
