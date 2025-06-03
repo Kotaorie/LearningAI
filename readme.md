@@ -38,14 +38,14 @@ Accès :
 
 Pour garder un historique clair, utilisez ce format pour vos commits :
 
-[Feat] Ajouter le système de génération de cours
-[Fix] Corriger le bug de validation du profil
-[Refactor] Réorganiser les fichiers du scheduler
-[Docs] Ajouter README pour course-service
-[Test] Ajouter tests unitaires sur user-service
-[Chore] MAJ des dépendances et config Docker
+ - [Feat] Ajouter le système de génération de cours
+ - [Fix] Corriger le bug de validation du profil
+ - [Refactor] Réorganiser les fichiers du scheduler
+ - [Docs] Ajouter README pour course-service
+ - [Test] Ajouter tests unitaires sur user-service
+ - [Chore] MAJ des dépendances et config Docker
 
-    Chaque PR doit être validée par un membre de l'équipe + passer la CI avant d'être mergée.
+Chaque PR doit être validée par un membre de l'équipe + passer la CI avant d'être mergée.
 
 ### 📁 Structure (exemple)
 
