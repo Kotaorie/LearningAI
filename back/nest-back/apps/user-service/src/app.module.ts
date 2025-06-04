@@ -10,7 +10,9 @@ import { join } from 'path';
   imports: [
     ConfigModule.forRoot({ 
       isGlobal: true, 
-      envFilePath: join('../../.env'), 
+      envFilePath: join('../../.env'), // Adjust the path as needed
+      // envFilePath: process.env.NODE_ENV === 'test' ? '../../.env.test' : '../../.env'
+
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

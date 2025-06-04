@@ -1,0 +1,16 @@
+{
+  "monorepo": true,
+  "root": "apps",
+  "projects": {
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main"
+    },
+    "user-service": {
+      "type": "application",
+      "root": "apps/user-service",
+      "entryFile": "main"
+    }
+  }
+}
