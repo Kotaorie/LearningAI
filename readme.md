@@ -1,5 +1,7 @@
 # 🧠 LearningAI - Plateforme de formation intelligente
 
+test rules main branch
+
 LearningAI est une plateforme web d'apprentissage assisté par IA. Elle génère des cours personnalisés (vidéos et textes), ainsi que des quiz, en fonction du profil de l'utilisateur : niveau, objectifs, disponibilités hebdomadaires. L'infrastructure repose sur une architecture microservices, RabbitMQ pour la file de traitement, et GraphQL comme point d'entrée.
 
 ---
