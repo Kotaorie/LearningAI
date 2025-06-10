@@ -1,10 +1,10 @@
 services:
   user-service:
     build:
-      context: ./back/user-service
+      context: ./back/nest-back/apps/user-service
       dockerfile:  Dockerfile
     volumes:
-      - ./back/user-service:/usr/src/app:rw
+      - ./back/nest-back/apps/user-service:/usr/src/app:rw
     ports:
       - "3001:3001"
     depends_on:
