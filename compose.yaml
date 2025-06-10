@@ -1,7 +1,7 @@
 services:
   user-service:
     build:
-      context: ./back/nest-back/apps/user-service
+      context: ./back/nest-back
       dockerfile:  Dockerfile
     volumes:
       - ./back/nest-back/apps/user-service:/usr/src/app:rw
