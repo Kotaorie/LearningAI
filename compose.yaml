@@ -34,6 +34,15 @@ services:
     networks:
       - app_network
 
+  nuxt-app:
+    build:
+      context: ./nuxt-app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - app_network
+
 
 volumes:
   postgres_data:
