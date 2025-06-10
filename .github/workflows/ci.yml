@@ -43,8 +43,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working-directory: ./back/user-service
+        working-directory: ./back/nest-back
 
-      - name: Run integration tests
-        run: npm run test:integration
-        working-directory: ./back/user-service
+      - name: Run user-service tests
+        run: npm run test:userservice
+        working-directory: ./back/nest-back
+      
+      - name: Run api-gateway tests
+        run: npm run test:apigateway
+        working-directory: ./back/nest-back
