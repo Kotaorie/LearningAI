@@ -5,12 +5,15 @@ import { UserModule } from './user/user.module';
 import { User } from './user/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ 
       isGlobal: true, 
       envFilePath: join('../../.env'), 
+      // envFilePath: process.env.NODE_ENV === 'test' ? '../../.env.test' : '../../.env'
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -26,8 +29,10 @@ import { join } from 'path';
         synchronize: true,
       }),
     }),
-    AuthModule,
     UserModule,
+    AuthModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
