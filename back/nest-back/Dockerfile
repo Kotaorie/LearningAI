@@ -11,8 +11,8 @@ RUN npm install
 COPY ./apps/user-service ./apps/user-service
 
 # Build si tu as un script build spécifique à user-service (à adapter)
-WORKDIR /usr/src/app/apps/user-service
-RUN npm run build
+WORKDIR /usr/src/app
+RUN npm run start:userservice
 
 FROM node:18-alpine
 WORKDIR /usr/src/app/apps/user-service
