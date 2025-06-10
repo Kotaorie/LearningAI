@@ -2,23 +2,29 @@ FROM node:18-alpine AS builder
 
 WORKDIR /usr/src/app
 
-# Copier package.json et package-lock.json de la racine nest-back
+# Copier les fichiers racine nécessaires
 COPY package*.json ./
+COPY nest-cli.json tsconfig*.json ./
 
+# Installer les dépendances
 RUN npm install
 
-# Copier seulement le dossier user-service dans apps/
-COPY ./apps/user-service ./apps/user-service
+# Copier tous les fichiers du projet Nest (mono-repo)
+COPY apps ./apps
+COPY libs ./libs
 
-# Build si tu as un script build spécifique à user-service (à adapter)
-WORKDIR /usr/src/app
-RUN npm run start:userservice
+# Compiler uniquement le user-service
+RUN npm run build user-service
 
+# Étape finale - image légère
 FROM node:18-alpine
-WORKDIR /usr/src/app/apps/user-service
 
-COPY --from=builder /usr/src/app/apps/user-service/dist ./dist
+WORKDIR /usr/src/app
+
+# Copier le build et les dépendances
+COPY --from=builder /usr/src/app/dist/apps/user-service ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/apps/user-service/package*.json ./
 
+# Lancer le service compilé
 CMD ["node", "dist/main.js"]
