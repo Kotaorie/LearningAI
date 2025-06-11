@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:22.11.0-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -16,7 +16,7 @@ COPY apps ./apps
 RUN npm run build:user-service
 
 # Étape finale - image légère
-FROM node:18-alpine
+FROM node:22.11.0-alpine
 
 WORKDIR /usr/src/app
 
