@@ -1,34 +1,112 @@
-name: Deploy to EC2
+name: Build and Deploy
+
 on:
   push:
     branches: [Staging, Prod]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_FRONTEND: ${{ github.repository }}/frontend
+  IMAGE_NAME_BACKEND: ${{ github.repository }}/backend
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    outputs:
+      frontend-image: ${{ steps.meta-frontend.outputs.tags }}
+      backend-image: ${{ steps.meta-backend.outputs.tags }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        
-      - name: Deploy via SSH
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Build Frontend
+      - name: Extract metadata for frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./nuxt-app
+          file: ./nuxt-app/Dockerfile
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Build Backend
+      - name: Extract metadata for backend
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./back/nest-back
+          file: ./back/nest-back/Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/Staging' || github.ref == 'refs/heads/Prod'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          timeout: 30m
+          envs: GITHUB_SHA,GITHUB_REF_NAME
           script: |
             cd /home/ubuntu/LearningAI
-          
-            git pull origin Staging
             
-            docker system prune -f
+            # Login au registry GitHub
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
+            # Pull du nouveau code
+            git pull origin $GITHUB_REF_NAME
+            
+            # Variables d'environnement pour les images
+            export FRONTEND_IMAGE=$(echo "${{ needs.build.outputs.frontend-image }}" | head -n1)
+            export BACKEND_IMAGE=$(echo "${{ needs.build.outputs.backend-image }}" | head -n1)
+            
+            echo "Frontend image: $FRONTEND_IMAGE"
+            echo "Backend image: $BACKEND_IMAGE"
+            
+            # Déploiement
             docker compose down
-            
-            docker compose build --parallel
+            docker compose pull
             docker compose up -d
             
-            sleep 10
+            # Nettoyage
+            docker image prune -f
+            
+            # Status
             docker compose ps
