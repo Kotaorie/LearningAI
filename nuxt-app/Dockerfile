@@ -5,7 +5,7 @@ FROM node:22.11.0-alpine AS builder
 
 WORKDIR /app
 
-COPY nuxt-app/package*.json ./nuxt-app/
+COPY nuxt-app/package*.json ./
 RUN cd nuxt-app && npm install
 
 COPY nuxt-app ./nuxt-app
