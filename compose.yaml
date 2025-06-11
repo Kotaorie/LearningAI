@@ -21,7 +21,7 @@ services:
 
   nuxt-app:
     build:
-      context: .
+      context: ./nuxt-app
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
