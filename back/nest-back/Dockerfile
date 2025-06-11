@@ -11,7 +11,6 @@ RUN npm install
 
 # Copier tous les fichiers du projet Nest (mono-repo)
 COPY apps ./apps
-COPY libs ./libs
 
 # Compiler uniquement le user-service
 RUN npm run build user-service
