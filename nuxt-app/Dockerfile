@@ -1,22 +1,21 @@
+# Dockerfile.front
+
+# Étape 1 : build Nuxt
 FROM node:22.11.0-alpine AS builder
 
 WORKDIR /app
 
 COPY nuxt-app/package*.json ./nuxt-app/
+RUN cd nuxt-app && npm install
+
 COPY nuxt-app ./nuxt-app
+RUN cd nuxt-app && npm run build
 
-WORKDIR /app/nuxt-app
-RUN npm ci
-RUN npm run build
-
+# Étape 2 : runner léger
 FROM node:22.11.0-alpine
 
 WORKDIR /app
+COPY --from=builder /app/nuxt-app/.output ./
 
-COPY --from=builder /app/nuxt-app/.output ./.output
-COPY --from=builder /app/nuxt-app/node_modules ./node_modules
-COPY --from=builder /app/nuxt-app/package*.json ./
-
-ENV HOST 0.0.0.0
 EXPOSE 3000
-CMD ["npm", "run", "preview"]
+CMD ["node", "server/index.mjs"]
