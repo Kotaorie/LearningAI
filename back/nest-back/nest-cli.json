@@ -1,16 +1,32 @@
 {
   "monorepo": true,
   "root": "apps",
+  "sourceRoot": "apps",
+  "compilerOptions": {
+    "webpack": false,
+    "tsConfigPath": "tsconfig.build.json",
+    "deleteOutDir": true
+  },
   "projects": {
     "api-gateway": {
       "type": "application",
       "root": "apps/api-gateway",
-      "entryFile": "main"
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "./tsconfig.build.json",
+        "outputPath": "dist/apps/api-gateway"
+      }
     },
     "user-service": {
       "type": "application",
       "root": "apps/user-service",
-      "entryFile": "main"
+      "entryFile": "main",
+      "sourceRoot": "apps/user-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "./tsconfig.build.json",
+        "outputPath": "dist/apps/user-service"
+      }
     }
   }
 }

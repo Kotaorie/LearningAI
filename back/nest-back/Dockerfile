@@ -13,7 +13,7 @@ RUN npm install
 COPY apps ./apps
 
 # Compiler uniquement le user-service
-RUN npm run build user-service
+RUN npm run build:user-service
 
 # Étape finale - image légère
 FROM node:18-alpine
@@ -21,9 +21,9 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # Copier le build et les dépendances
-COPY --from=builder /usr/src/app/dist/apps/user-service ./dist
+COPY --from=builder /usr/src/app/dist/user-service ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/apps/user-service/package*.json ./
+COPY --from=builder /usr/src/app/package*.json ./
 
 # Lancer le service compilé
 CMD ["node", "dist/main.js"]
