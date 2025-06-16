@@ -213,4 +213,3 @@ describe('QuizzController (e2e)', () => {
     expect(res.body).toEqual({ deleted: true });
   });
 });
-
