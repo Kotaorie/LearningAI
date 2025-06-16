@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChapterService } from './chapter.service';
-import { ChapterController } from './chapter.controller';
-import { Chapter } from './chapter.entity';
+import { Chapter } from '../../../../libs/database/src/entities/chapter.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { ChapterResolver } from './chapter.resolver';
 
 @Module({
   imports: [
@@ -13,8 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
           signOptions: { expiresIn: '1d' },
         }),
   ],
-  controllers: [ChapterController],
-  providers: [ChapterService],
+  providers: [ChapterService, ChapterResolver],
   exports: [ChapterService],
 })
 export class UserModule {}

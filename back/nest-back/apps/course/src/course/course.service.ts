@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Course } from './course.entity';
+import { Course } from '../../../../libs/database/src/entities/course.entity';
 
 @Injectable()
 export class CourseService {
@@ -19,11 +19,11 @@ export class CourseService {
     return this.courseRepository.find();
   }
 
-  async findById(id: number): Promise<Course | null> {
+  async findById(id: string): Promise<Course | null> {
     return this.courseRepository.findOne({ where: { id } });
   }
 
- async update(id: number, data: Partial<Course>): Promise<Course> {
+ async update(id: string, data: Partial<Course>): Promise<Course> {
   await this.courseRepository.update(id, data);
   const updated = await this.findById(id);
 
@@ -35,7 +35,11 @@ export class CourseService {
 }
 
 
-  async delete(id: number): Promise<void> {
-    await this.courseRepository.delete(id);
+  async delete(id: string): Promise<{deleted: boolean}> {
+  const result = await this.courseRepository.delete(id);
+  if (result.affected === undefined || result.affected === null || result.affected === 0) {
+    throw new Error(`Course with ID ${id} not found`);
+  }
+  return { deleted: result.affected > 0 };
   }
 }

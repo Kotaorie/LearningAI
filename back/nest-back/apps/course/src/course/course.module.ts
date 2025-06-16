@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CourseService } from './course.service';
-import { CourseController } from './course.controller';
-import { Course } from './course.entity';
+import { Course } from '../../../../libs/database/src/entities/course.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { CourseResolver } from './course.resolver';
 
 @Module({
   imports: [
@@ -13,8 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
           signOptions: { expiresIn: '1d' },
         }),
   ],
-  controllers: [CourseController],
-  providers: [CourseService],
+  providers: [CourseService, CourseResolver],
   exports: [CourseService],
 })
 export class UserModule {}

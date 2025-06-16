@@ -2,21 +2,21 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 
 @Entity('course')
 export class Course {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
-  user_id: number;
+  userId: string;
 
   @Column()
   title: string;
 
   @Column()
-  level: string;
+  level: number;
 
   @Column()
   status: string;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 }
