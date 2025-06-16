@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { CourseServiceModule } from './course-service.module';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(CourseServiceModule);
-  await app.listen(process.env.API_GATEWAY_PORT ?? 3001);
+  const app = await NestFactory.create(AppModule);
+  await app.listen(process.env.PORT ?? 3003);
 }
 bootstrap();
