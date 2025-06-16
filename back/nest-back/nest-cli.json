@@ -14,8 +14,34 @@
       "entryFile": "main",
       "sourceRoot": "apps/api-gateway/src",
       "compilerOptions": {
-        "tsConfigPath": "./tsconfig.build.json",
-        "outputPath": "dist/apps/api-gateway"
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "course-service": {
+      "type": "application",
+      "root": "apps/course-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/course-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/course-service/tsconfig.app.json"
+      }
+    },
+    "notification-service": {
+      "type": "application",
+      "root": "apps/notification-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification-service/tsconfig.app.json"
+      }
+    },
+    "schedule-service": {
+      "type": "application",
+      "root": "apps/schedule-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/schedule-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/schedule-service/tsconfig.app.json"
       }
     },
     "user-service": {
