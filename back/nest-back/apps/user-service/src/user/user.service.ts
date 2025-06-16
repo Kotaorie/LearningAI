@@ -29,10 +29,14 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async update(id: string, data: Partial<User>): Promise<User | null> {
+  async update(data: Partial<User>): Promise<User | null> {
     if(data.password_hash) {
       const salt = await bcrypt.genSalt(10);
       data.password_hash = await bcrypt.hash(data.password_hash, salt);
+    }
+    const id = data.id;
+    if (!id) {
+      throw new Error('User ID is required for update');
     }
     await this.userRepository.update(id, data);
     return this.userRepository.findOne({ where: { id } });
@@ -44,7 +48,7 @@ export class UserService {
     });
   }
 
-  async delete(id: number): Promise<{ deleted: boolean }> {
+  async delete(id: string): Promise<{ deleted: boolean }> {
     await this.userRepository.delete(id);
     return { deleted: true };
   }

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './user.service';
-import { UserController } from './user.controller';
 import { User } from '../../../../libs/database/src/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { UserResolver } from './user.resolver';
 
 @Module({
   imports: [
@@ -13,8 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
           signOptions: { expiresIn: '1d' },
         }),
   ],
-  controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, UserResolver],
   exports: [UserService],
 })
 export class UserModule {}

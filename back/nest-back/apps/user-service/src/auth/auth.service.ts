@@ -24,7 +24,6 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    dto.password = bcrypt.hashSync(dto.password, 10);
     const user = await this.userService.findByEmail(dto.email);
     if (!user || !(await bcrypt.compare(dto.password, user.password_hash))) {
       throw new UnauthorizedException('Identifiants invalides');
@@ -33,6 +32,7 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email };
     return {
       access_token: this.jwtService.sign(payload),
+      google_auth_url: await this.getGoogleAuthUrl()
     };
   }
 }

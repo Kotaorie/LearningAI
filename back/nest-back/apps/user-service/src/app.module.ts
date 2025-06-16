@@ -6,9 +6,11 @@ import { User } from '../../../libs/database/src/entities/user.entity';
 import { DatabaseModule } from '../../../libs/database/src/database.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { GraphqlModule } from '../../../libs/graphql/src/graphql.module';
 
 @Module({
   imports: [
+    GraphqlModule,
     DatabaseModule,
     TypeOrmModule.forFeature([User]),
     UserModule,
