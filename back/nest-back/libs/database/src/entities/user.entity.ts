@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({ unique: true })
   email: string;
@@ -19,4 +19,8 @@ export class User {
 
   @Column()
   level: number;
+
+  @Column({ nullable: true })
+  googleTokens: string;
+  
 }

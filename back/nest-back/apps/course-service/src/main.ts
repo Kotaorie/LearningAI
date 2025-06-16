@@ -3,6 +3,6 @@ import { CourseServiceModule } from './course-service.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(CourseServiceModule);
-  await app.listen(process.env.port ?? 3000);
+  await app.listen(process.env.API_GATEWAY_PORT ?? 3001);
 }
 bootstrap();

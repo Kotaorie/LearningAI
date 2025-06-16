@@ -14,6 +14,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/nest-back/main",
     "start:userservice": "ts-node apps/user-service/src/main.ts",
+    "start:schedule": "ts-node apps/schedule/src/main.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -23,16 +24,23 @@
     "test:e2e": "jest --config ./apps/nest-back/test/jest-e2e.json"
   },
   "dependencies": {
+    "@apollo/server": "^4.12.2",
+    "@nestjs/apollo": "^13.1.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/graphql": "^13.1.0",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.2.0",
     "@nestjs/typeorm": "^11.0.0",
+    "apollo-server-express": "^3.13.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "googleapis": "^150.0.1",
+    "graphql": "^16.11.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.0",
@@ -85,7 +93,13 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
-    ]
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@libs/database(|/.*)$": "<rootDir>/libs/database/src/$1",
+      "^@libs/google-calendar(|/.*)$": "<rootDir>/libs/google-calendar/src/$1",
+      "^@libs/graphql(|/.*)$": "<rootDir>/libs/graphql/src/$1"
+    }
   }
 }

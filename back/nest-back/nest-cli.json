@@ -26,6 +26,33 @@
         "tsConfigPath": "apps/course-service/tsconfig.app.json"
       }
     },
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "google-calendar": {
+      "type": "library",
+      "root": "libs/google-calendar",
+      "entryFile": "index",
+      "sourceRoot": "libs/google-calendar/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/google-calendar/tsconfig.lib.json"
+      }
+    },
+    "graphql": {
+      "type": "library",
+      "root": "libs/graphql",
+      "entryFile": "index",
+      "sourceRoot": "libs/graphql/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/graphql/tsconfig.lib.json"
+      }
+    },
     "notification-service": {
       "type": "application",
       "root": "apps/notification-service",
@@ -33,6 +60,15 @@
       "sourceRoot": "apps/notification-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/notification-service/tsconfig.app.json"
+      }
+    },
+    "schedule": {
+      "type": "application",
+      "root": "apps/schedule",
+      "entryFile": "main",
+      "sourceRoot": "apps/schedule/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/schedule/tsconfig.app.json"
       }
     },
     "schedule-service": {

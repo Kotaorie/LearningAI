@@ -17,6 +17,25 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {}
+    "paths": {
+      "@libs/database": [
+        "libs/database/src"
+      ],
+      "@libs/database/*": [
+        "libs/database/src/*"
+      ],
+      "@libs/google-calendar": [
+        "libs/google-calendar/src"
+      ],
+      "@libs/google-calendar/*": [
+        "libs/google-calendar/src/*"
+      ],
+      "@libs/graphql": [
+        "libs/graphql/src"
+      ],
+      "@libs/graphql/*": [
+        "libs/graphql/src/*"
+      ]
+    }
   }
 }

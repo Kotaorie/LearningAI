@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { ScheduleServiceModule } from './../src/schedule-service.module';
+import { ScheduleModule } from './../src/schedule.module';
 
-describe('ScheduleServiceController (e2e)', () => {
+describe('ScheduleController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [ScheduleServiceModule],
+      imports: [ScheduleModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();

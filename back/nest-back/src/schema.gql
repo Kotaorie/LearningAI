@@ -1,0 +1,35 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateScheduleInput {
+  courseId: String!
+  courseName: String!
+  days: [String!]!
+  durationWeeks: Float!
+  hoursPerSession: Float!
+  startDate: String!
+  userId: String!
+}
+
+type Mutation {
+  createSchedule(createScheduleInput: CreateScheduleInput!): Schedule!
+  deleteSchedule(id: String!): Boolean!
+  updateSchedule(id: String!, updateScheduleInput: CreateScheduleInput!): Schedule!
+}
+
+type Query {
+  schedule(id: String!): Schedule!
+  schedulesByUser(userId: String!): [Schedule!]!
+}
+
+type Schedule {
+  courseId: String!
+  courseName: String!
+  days: [String!]!
+  durationWeeks: Float!
+  hoursPerSession: Float!
+  id: String!
+  startDate: String!
+  userId: String!
+}
