@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../../../../libs/database/src/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
 
@@ -16,6 +16,10 @@ export class UserService {
     return this.userRepository.findOne({ where: { email } });
   }
 
+  async findById(id: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { id } });
+  }
+
   async create(data: Partial<User>): Promise<User> {
     if (data.password_hash) {
       const salt = await bcrypt.genSalt(10);
@@ -25,16 +29,26 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async update(id: number, data: Partial<User>): Promise<User | null> {
+  async update(data: Partial<User>): Promise<User | null> {
     if(data.password_hash) {
       const salt = await bcrypt.genSalt(10);
       data.password_hash = await bcrypt.hash(data.password_hash, salt);
+    }
+    const id = data.id;
+    if (!id) {
+      throw new Error('User ID is required for update');
     }
     await this.userRepository.update(id, data);
     return this.userRepository.findOne({ where: { id } });
   }
 
-  async delete(id: number): Promise<{ deleted: boolean }> {
+  async updateGoogleTokens(userId: string, tokens: any): Promise<void> {
+    await this.userRepository.update(userId, {
+      googleTokens: tokens,
+    });
+  }
+
+  async delete(id: string): Promise<{ deleted: boolean }> {
     await this.userRepository.delete(id);
     return { deleted: true };
   }

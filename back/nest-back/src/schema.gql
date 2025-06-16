@@ -1,0 +1,46 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateUserInput {
+  email: String!
+  firstName: String!
+  googleTokens: String
+  lastName: String!
+  level: Float!
+  password_hash: String!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  deleteUser(id: String!): Boolean!
+  handleGoogleCallback(code: String!, userId: String!): Boolean!
+  login(email: String!, password: String!): String!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type Query {
+  getGoogleAuthUrl: String!
+  user(id: String!): User!
+  userByEmail(email: String!): User!
+}
+
+input UpdateUserInput {
+  email: String
+  firstName: String
+  googleTokens: String
+  id: String!
+  lastName: String
+  level: Float
+  password_hash: String
+}
+
+type User {
+  email: String!
+  firstName: String!
+  googleTokens: String
+  id: String!
+  lastName: String!
+  level: Float!
+  password_hash: String!
+}
