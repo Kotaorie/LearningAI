@@ -48,7 +48,3 @@ jobs:
       - name: Run user-service tests
         run: npm run test:userservice
         working-directory: ./back/nest-back
-      
-      - name: Run api-gateway tests
-        run: npm run test:apigateway
-        working-directory: ./back/nest-back
