@@ -73,8 +73,10 @@ CREATE TABLE scheduled_sessions (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id),
   course_id INTEGER REFERENCES courses(id),
-  start_time TIMESTAMP,
-  duration_minutes INTEGER,
+  days VARCHAR(100)[],
+  hours_per_session INTEGER,
+  duration_weeks INTEGER,
+  start_date DATE,
   status VARCHAR(50)
 );
 

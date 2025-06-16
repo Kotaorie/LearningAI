@@ -3,7 +3,7 @@ import { Schedule } from '../../../libs/database/src/entities/schedule.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserService } from '../../user-service/src/user/user.service';
+import { UserService } from '../../user/src/user/user.service';
 
 
 
