@@ -2,7 +2,6 @@ import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
-import { LoginDto } from './dto/login.dto';
 import { GoogleCalendarService } from '../../../../libs/google-calendar/src/google-calendar.service';
 
 @Injectable()
@@ -17,15 +16,15 @@ export class AuthService {
     return this.googleCalendarService.generateAuthUrl();
   }
 
-  async handleGoogleCallback(code: string, userId: string) {
+  async handleGoogleCallBack(code: string, userId: string) {
     const tokens = await this.googleCalendarService.getTokensFromCode(code);
     await this.userService.updateGoogleTokens(userId, tokens);
     return { success: true };
   }
 
-  async login(dto: LoginDto) {
-    const user = await this.userService.findByEmail(dto.email);
-    if (!user || !(await bcrypt.compare(dto.password, user.password_hash))) {
+  async login(email: string, password: string): Promise<{ access_token: string; google_auth_url: string }> {
+    const user = await this.userService.findByEmail(email);
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
       throw new UnauthorizedException('Identifiants invalides');
     }
 

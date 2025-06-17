@@ -24,4 +24,4 @@ import { QuizzModule } from './quizz/quizz.module';
     QuizzModule,
   ],
 })
-export class AppModule {}
+export class AppCourseModule {}
