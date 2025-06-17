@@ -1,12 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Chapter } from './chapter.entity';
 
 @Entity('course')
 export class Course {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  userId: string;
+  @Column('uuid')
+  userId!: string;
 
   @Column()
   title: string;
@@ -19,4 +20,7 @@ export class Course {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(() => Chapter, (chapter) => chapter.course, { nullable: true })
+  chapters?: Chapter[];
 }

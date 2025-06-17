@@ -20,7 +20,7 @@ export class CourseService {
   }
 
   async findById(id: string): Promise<Course | null> {
-    return this.courseRepository.findOne({ where: { id } });
+    return this.courseRepository.findOne({ where: { id: id as any }, relations: ['chapters', 'chapters.lessons'] });
   }
 
  async update(id: string, data: Partial<Course>): Promise<Course> {
@@ -36,10 +36,10 @@ export class CourseService {
 
 
   async delete(id: string): Promise<{deleted: boolean}> {
-  const result = await this.courseRepository.delete(id);
-  if (result.affected === undefined || result.affected === null || result.affected === 0) {
-    throw new Error(`Course with ID ${id} not found`);
-  }
-  return { deleted: result.affected > 0 };
+    const result = await this.courseRepository.delete(id);
+    if (result.affected === undefined || result.affected === null || result.affected === 0) {
+      throw new Error(`Course with ID ${id} not found`);
+    }
+    return { deleted: result.affected > 0 };
   }
 }

@@ -1,12 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Chapter } from './chapter.entity';
 
 @Entity('lessons')
 export class Lesson {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  chapterId: string;
+  @Column('uuid')
+  chapterId!: string;
 
   @Column()
   title: string;
@@ -16,4 +17,7 @@ export class Lesson {
 
   @Column()
   position: number;
+
+  @ManyToOne(() => Chapter, chapter => chapter.lessons)
+  chapter: Chapter;
 }

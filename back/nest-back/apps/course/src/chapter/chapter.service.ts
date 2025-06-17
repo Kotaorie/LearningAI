@@ -5,24 +5,26 @@ import { Chapter } from '../../../../libs/database/src/entities/chapter.entity';
 
 @Injectable()
 export class ChapterService {
-    constructor(@InjectRepository(Chapter) private chapterRepository: Repository<Chapter>){}
+  constructor(@InjectRepository(Chapter) private chapterRepository: Repository<Chapter>){}
 
-    async create(data: Partial<Chapter>): Promise<Chapter> {
-      const chapter = this.chapterRepository.create(data);
-      return this.chapterRepository.save(chapter);
-    } 
-  
-    async findAll(): Promise<Chapter[]> {
-      return this.chapterRepository.find();
-    }
+  async create(data: Partial<Chapter>): Promise<Chapter> {
+    const chapter = this.chapterRepository.create(data);
+    return this.chapterRepository.save(chapter);
+  } 
 
-    async findById(id: string): Promise<Chapter | null> {
-      return this.chapterRepository.findOne({ where: { id } }); 
-    }
+  async findAll(): Promise<Chapter[]> {
+    return this.chapterRepository.find();
+  }
+
+  async findById(id: string): Promise<Chapter | null> {
+    return this.chapterRepository.findOne({ where: { id: id as any }, relations: ['lessons'] }); 
+  }
+
   async findByCourseId(courseId: string): Promise<Chapter[]> {
     return this.chapterRepository.find({
       where: { courseId: courseId },
       order: { position: 'ASC' },
+      relations: ['lessons'],
     });
 }
 async update(id: string, data: Partial<Chapter>): Promise<Chapter> {

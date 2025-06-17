@@ -1,4 +1,5 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
+import { Chapter } from '../chapter/chapter.model';
 
 @ObjectType()
 export class Course {
@@ -19,6 +20,9 @@ export class Course {
 
   @Field()
   createdAt: Date;
+
+  @Field(() => [Chapter], { nullable: true })
+  chapters?: Chapter[];
 }
 
 @InputType()

@@ -7,6 +7,11 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d libs/database/src/data-source.ts",
+    "migration:create": "typeorm-ts-node-commonjs migration:create",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d libs/database/src/data-source.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d libs/database/src/data-source.ts",
+    "migration:show": "typeorm-ts-node-commonjs migration:show -d libs/database/src/data-source.ts",
     "build:user-service": "nest build apps/user-service",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",

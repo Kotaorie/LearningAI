@@ -1,5 +1,7 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   first_name VARCHAR(100),
@@ -8,8 +10,8 @@ CREATE TABLE users (
 );
 
 CREATE TABLE courses (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id),
   title VARCHAR(255) NOT NULL,
   level VARCHAR(50),
   status VARCHAR(50),
@@ -17,41 +19,41 @@ CREATE TABLE courses (
 );
 
 CREATE TABLE chapters (
-  id SERIAL PRIMARY KEY,
-  course_id INTEGER REFERENCES courses(id),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  course_id UUID REFERENCES courses(id),
   title VARCHAR(255),
   position INTEGER
 );
 
 CREATE TABLE lessons (
-  id SERIAL PRIMARY KEY,
-  chapter_id INTEGER REFERENCES chapters(id),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  chapter_id UUID REFERENCES chapters(id),
   title VARCHAR(255),
   content_markdown TEXT,
   position INTEGER
 );
 
 CREATE TABLE quizzes (
-  id SERIAL PRIMARY KEY,
-  course_id INTEGER REFERENCES courses(id) NULL,
-  chapter_id INTEGER REFERENCES chapters(id) NULL,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  course_id UUID REFERENCES courses(id) NULL,
+  chapter_id UUID REFERENCES chapters(id) NULL,
   title VARCHAR(255),
   questions_json JSONB,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE user_courses (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
-  course_id INTEGER REFERENCES courses(id),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id),
+  course_id UUID REFERENCES courses(id),
   enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   status VARCHAR(50)
 );
 
 CREATE TABLE user_course_quizz (
-  id SERIAL PRIMARY KEY,
-  user_course_id INTEGER REFERENCES user_courses(id),
-  quiz_id INTEGER REFERENCES quizzes(id),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_course_id UUID REFERENCES user_courses(id),
+  quiz_id UUID REFERENCES quizzes(id),
   completed BOOLEAN DEFAULT FALSE,
   score INTEGER,
   attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -59,20 +61,20 @@ CREATE TABLE user_course_quizz (
 );
 
 CREATE TABLE tags (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(100)
 );
 
 CREATE TABLE course_tags (
-  id SERIAL PRIMARY KEY,
-  course_id INTEGER REFERENCES courses(id),
-  tag_id INTEGER REFERENCES tags(id)
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  course_id UUID REFERENCES courses(id),
+  tag_id UUID REFERENCES tags(id)
 );
 
 CREATE TABLE scheduled_sessions (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
-  course_id INTEGER REFERENCES courses(id),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id),
+  course_id UUID REFERENCES courses(id),
   days VARCHAR(100)[],
   hours_per_session INTEGER,
   duration_weeks INTEGER,
@@ -81,8 +83,8 @@ CREATE TABLE scheduled_sessions (
 );
 
 CREATE TABLE notifications (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id),
   message VARCHAR(255),
   type VARCHAR(50),
   sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -90,9 +92,9 @@ CREATE TABLE notifications (
 );
 
 CREATE TABLE user_skill_progress (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
-  tag_id INTEGER REFERENCES tags(id),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id),
+  tag_id UUID REFERENCES tags(id),
   progress_percent INTEGER,
   courses_completed INTEGER
 );

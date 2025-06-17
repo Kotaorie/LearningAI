@@ -1,4 +1,5 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
+import { Lesson } from '../lesson/lesson.model';
 
 @ObjectType()
 export class Chapter {
@@ -13,6 +14,9 @@ export class Chapter {
 
   @Field()
   position: number;
+
+  @Field(() => [Lesson], { nullable: true })
+  lessons?: Lesson[];
 }
 
 @InputType()
