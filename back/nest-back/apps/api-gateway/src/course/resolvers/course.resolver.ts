@@ -10,12 +10,14 @@ export class CourseResolver {
 
     @Mutation(() => Course)
     async createCourse(@Args('createCourseInput') createCourseInput: CreateCourseInput): Promise<Course> {
-        return await firstValueFrom(this.courseClient.send('course.create', createCourseInput));
+        const existingCourse = await firstValueFrom(this.courseClient.send('course.create', createCourseInput));
+        return { ...existingCourse, createdAt: new Date(existingCourse.createdAt),};
     }
 
     @Query(() => [Course], { name: 'courses' })
     async getAllCourses(): Promise<Course[]> {
-        return firstValueFrom(this.courseClient.send('course.findAll', {}));
+        const existingCourses = await firstValueFrom(this.courseClient.send('course.findAll', {}));
+        return {...existingCourses, createdAt: new Date(existingCourses.createdAt),};
     }
 
     @Query(() => Course, { name: 'course' })
@@ -24,7 +26,7 @@ export class CourseResolver {
         if (!course) {
             throw new Error(`Course with id ${id} not found`);
         }
-        return course;
+        return {...course, createdAt: new Date(course.createdAt),};
     }
 
     @Mutation(() => Course)

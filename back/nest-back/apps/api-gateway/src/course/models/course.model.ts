@@ -1,5 +1,6 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { Chapter } from './chapter.model';
+import { GraphQLISODateTime } from '@nestjs/graphql';
 
 @ObjectType()
 export class Course {
@@ -18,7 +19,7 @@ export class Course {
   @Field()
   status: string;
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date;
 
   @Field(() => [Chapter], { nullable: true })
