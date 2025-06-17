@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QuizzService } from './quizz.service';
-import { QuizzController } from './quizz.controller';
-import { Quizz } from './quizz.entity';
+import { Quizz } from '../../../../libs/database/src/entities/quizz.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { QuizzResolver } from './quizz.resolver';
 
 @Module({
   imports: [
@@ -13,8 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
           signOptions: { expiresIn: '1d' },
         }),
   ],
-  controllers: [QuizzController],
-  providers: [QuizzService],
+  providers: [QuizzService, QuizzResolver],
   exports: [QuizzService],
 })
-export class UserModule {}
+export class QuizzModule {}

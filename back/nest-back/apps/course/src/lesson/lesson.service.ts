@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Lesson } from './lesson.entity';
+import { Lesson } from '../../../../libs/database/src/entities/lesson.entity';
 
 @Injectable()
 export class LessonService {
@@ -15,17 +15,17 @@ export class LessonService {
     return this.lessonRepository.save(user);
   } 
 
-    async findById(id: number): Promise<Lesson | null> {
+    async findById(id: string): Promise<Lesson | null> {
     return this.lessonRepository.findOne({ where: { id } }); 
   }
 
-  async findByChapterId(chapterId: number): Promise<Lesson[]> {
+  async findByChapterId(chapterId: string): Promise<Lesson[]> {
       return this.lessonRepository.find({
-        where: { chapter_id: chapterId },
+        where: { chapterId: chapterId },
         order: { position: 'ASC' },
       });
   }
-  async update(id: number, data: Partial<Lesson>): Promise<Lesson> {
+  async update(id: string, data: Partial<Lesson>): Promise<Lesson> {
     await this.lessonRepository.update(id, data);
     const updated = await this.findById(id);
   
@@ -36,7 +36,12 @@ export class LessonService {
     return updated;
   }
   
-  async delete(id: number): Promise<void> {
-    await this.lessonRepository.delete(id);
+  async delete(id: string): Promise<{ deleted: boolean }> {
+    const result = await this.lessonRepository.delete(id);
+    if (result.affected === undefined || result.affected === null) {
+      const errorMsg = `Delete operation did not return an affected count; no schedule deleted for id: ${id}`;
+      throw new Error(errorMsg);
+    }
+    return { deleted: result.affected > 0  };
   }
 }

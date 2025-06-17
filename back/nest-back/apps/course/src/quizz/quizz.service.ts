@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Quizz } from './quizz.entity';
+import { Quizz } from '../../../../libs/database/src/entities/quizz.entity';
 
 @Injectable()
 export class QuizzService {
@@ -15,7 +15,7 @@ export class QuizzService {
     return this.quizzRepository.save(quizz);
   }
 
-  async findById(id: number): Promise<Quizz | null> {
+  async findById(id: string): Promise<Quizz | null> {
     return this.quizzRepository.findOne({ where: { id } });
   }
 
@@ -23,20 +23,20 @@ export class QuizzService {
       return this.quizzRepository.find();
     }
 
-  async getQuestionsByQuizId(id: number): Promise<any[]> {
+  async getQuestionsByQuizId(id: string): Promise<any[]> {
     const quizz = await this.quizzRepository.findOne({
       where: { id },
-      select: ['questions_json'],
+      select: ['questionsJson'],
     });
 
     if (!quizz) {
       throw new NotFoundException(`Quiz with id ${id} not found`);
     }
 
-    return quizz.questions_json;
+    return quizz.questionsJson;
   }
 
-  async update(id: number, data: Partial<Quizz>): Promise<Quizz> {
+  async update(id: string, data: Partial<Quizz>): Promise<Quizz> {
       await this.quizzRepository.update(id, data);
       const updated = await this.findById(id);
     
@@ -47,7 +47,12 @@ export class QuizzService {
       return updated;
     }
 
-  async delete(id: number): Promise<void> {
-    await this.quizzRepository.delete(id);
+  async delete(id: string): Promise<{ deleted: boolean }> {
+    const result = await this.quizzRepository.delete(id);
+    if (result.affected === undefined || result.affected === null) {
+      const errorMsg = `Delete operation did not return an affected count; no schedule deleted for id: ${id}`;
+      throw new Error(errorMsg);
+    }
+    return { deleted: result.affected > 0  };
   }
 }

@@ -16,4 +16,4 @@ import { ChapterResolver } from './chapter.resolver';
   providers: [ChapterService, ChapterResolver],
   exports: [ChapterService],
 })
-export class UserModule {}
+export class ChapterModule {}

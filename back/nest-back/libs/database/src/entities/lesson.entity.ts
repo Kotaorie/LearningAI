@@ -2,17 +2,17 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 
 @Entity('lessons')
 export class Lesson {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
-  chapter_id: number;
+  chapterId: string;
 
   @Column()
   title: string;
 
   @Column({ type: 'text' })
-  content_markdown: string;
+  contentMarkdown: string;
 
   @Column()
   position: number;
