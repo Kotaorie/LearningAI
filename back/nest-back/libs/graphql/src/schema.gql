@@ -1,0 +1,97 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Chapter {
+  courseId: String!
+  id: String!
+  lessons: [Lesson!]
+  position: Float!
+  title: String!
+}
+
+type Course {
+  chapters: [Chapter!]
+  createdAt: DateTime!
+  id: String!
+  level: Float!
+  status: String!
+  title: String!
+  userId: String!
+}
+
+input CreateChapterInput {
+  courseId: String!
+  position: Float!
+  title: String!
+}
+
+input CreateCourseInput {
+  level: Float!
+  status: String!
+  title: String!
+  userId: String!
+}
+
+input CreateLessonInput {
+  chapterId: String!
+  contentMarkdown: String!
+  position: Float!
+  title: String!
+}
+
+input CreateQuizzInput {
+  chapterId: String!
+  courseId: String!
+  createdAt: DateTime!
+  questionsJson: String!
+  title: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Lesson {
+  chapterId: String!
+  contentMarkdown: String!
+  id: String!
+  position: Float!
+  title: String!
+}
+
+type Mutation {
+  createChapter(createChapterInput: CreateChapterInput!): Chapter!
+  createCourse(createCourseInput: CreateCourseInput!): Course!
+  createLesson(createLessonInput: CreateLessonInput!): Lesson!
+  createQuizz(CreateQuizzInput: CreateQuizzInput!): Quizz!
+  deleteChapter(id: String!): Boolean!
+  deleteCourse(id: String!): Boolean!
+  deleteLesson(id: String!): Boolean!
+  deleteQuizz(id: String!): Boolean!
+  updateChapter(id: String!, updateChapterInput: CreateChapterInput!): Chapter!
+  updateCourse(id: String!, updateCourseInput: CreateCourseInput!): Course!
+  updateLesson(id: String!, updateLessonInput: CreateLessonInput!): Lesson!
+  updateQuizz(id: String!, updateLessonInput: CreateQuizzInput!): Quizz!
+}
+
+type Query {
+  chapter(id: String!): Chapter!
+  chaptersByCourseId(courseId: String!): [Chapter!]!
+  course(id: String!): Course!
+  courses: [Course!]!
+  lesson(id: String!): Lesson!
+  lessonsByChapter(chapterId: String!): [Lesson!]!
+  quizz(id: String!): Quizz!
+  quizzesByChapter(chapterId: String!): [Quizz!]!
+}
+
+type Quizz {
+  chapterId: String!
+  courseId: String!
+  createdAt: DateTime!
+  id: String!
+  questionsJson: String!
+  title: String!
+}

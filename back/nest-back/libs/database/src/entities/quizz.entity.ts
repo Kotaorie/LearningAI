@@ -2,21 +2,21 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 
 @Entity('quizzes')
 export class Quizz {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
-  course_id: number;
+  courseId: string;
 
   @Column()
-  chapter_id: number;
+  chapterId: string;
 
   @Column()
   title: string;
 
   @Column({ type: 'jsonb' })
-  questions_json: any;
+  questionsJson: any;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 }
