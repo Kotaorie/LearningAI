@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Course } from '../../../libs/database/src/entities/course.entity';
 import { Lesson } from '../../../libs/database/src/entities/lesson.entity';
 import { Quizz } from '../../../libs/database/src/entities/quizz.entity';
-import { GraphqlModule } from '../../../libs/graphql/src/graphql.module';
 import { DatabaseModule } from '../../../libs/database/src/database.module';
 import { Chapter } from '../../../libs/database/src/entities/chapter.entity';
 
@@ -15,7 +14,6 @@ import { QuizzModule } from './quizz/quizz.module';
 
 @Module({
   imports: [
-    GraphqlModule,
     DatabaseModule,
     TypeOrmModule.forFeature([Course, Chapter, Lesson, Quizz]),
     CourseModule,
@@ -24,4 +22,4 @@ import { QuizzModule } from './quizz/quizz.module';
     QuizzModule,
   ],
 })
-export class AppModule {}
+export class AppCourseModule {}

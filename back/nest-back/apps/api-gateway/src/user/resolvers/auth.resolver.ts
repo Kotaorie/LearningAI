@@ -1,18 +1,16 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { UserService } from '../user/user.service';
-import {User, CreateUserInput, UpdateUserInput} from '../user/user.model';
-import { AuthService } from './auth.service';
+import { Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { User } from '../models/user.model';
+import { firstValueFrom } from 'rxjs';
 
 @Resolver(() => User)
 export class AuthResolver {
-    constructor(
-        private readonly authService: AuthService,
-        private readonly userService: UserService,
-    ) {}
+    constructor(@Inject('USER_SERVICE') private readonly userClient: ClientProxy) {}
 
     @Query(() => String)
     async getGoogleAuthUrl(): Promise<string> {
-        return this.authService.getGoogleAuthUrl();
+        return await firstValueFrom(this.userClient.send('auth.getGoogleAuthUrl', {}));
     }
 
     @Mutation(() => Boolean)
@@ -20,7 +18,7 @@ export class AuthResolver {
         @Args('code') code: string,
         @Args('userId') userId: string,
     ): Promise<boolean> {
-        const result = await this.authService.handleGoogleCallback(code, userId);
+        const result = await firstValueFrom(this.userClient.send('auth.handleGoogleCallBack',{code, userId}));
         return result.success;
     }
 
@@ -29,7 +27,7 @@ export class AuthResolver {
         @Args('email') email: string,
         @Args('password') password: string,
     ): Promise<any> {
-        const user = await this.authService.login({ email, password });
+        const user = await firstValueFrom(this.userClient.send('auth.login', { email, password }));
         return {
             access_token: user.access_token,
             google_auth_url: user.google_auth_url,

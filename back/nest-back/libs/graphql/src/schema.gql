@@ -40,12 +40,23 @@ input CreateLessonInput {
   title: String!
 }
 
-input CreateQuizzInput {
-  chapterId: String!
+input CreateScheduleInput {
   courseId: String!
-  createdAt: DateTime!
-  questionsJson: String!
-  title: String!
+  courseName: String!
+  days: [String!]!
+  durationWeeks: Float!
+  hoursPerSession: Float!
+  startDate: String!
+  userId: String!
+}
+
+input CreateUserInput {
+  email: String!
+  firstName: String!
+  googleTokens: String
+  lastName: String!
+  level: Float!
+  password_hash: String!
 }
 
 """
@@ -65,15 +76,20 @@ type Mutation {
   createChapter(createChapterInput: CreateChapterInput!): Chapter!
   createCourse(createCourseInput: CreateCourseInput!): Course!
   createLesson(createLessonInput: CreateLessonInput!): Lesson!
-  createQuizz(CreateQuizzInput: CreateQuizzInput!): Quizz!
+  createSchedule(createScheduleInput: CreateScheduleInput!): Schedule!
+  createUser(createUserInput: CreateUserInput!): User!
   deleteChapter(id: String!): Boolean!
   deleteCourse(id: String!): Boolean!
   deleteLesson(id: String!): Boolean!
-  deleteQuizz(id: String!): Boolean!
+  deleteSchedule(id: String!): Boolean!
+  deleteUser(id: String!): Boolean!
+  handleGoogleCallback(code: String!, userId: String!): Boolean!
+  login(email: String!, password: String!): String!
   updateChapter(id: String!, updateChapterInput: CreateChapterInput!): Chapter!
   updateCourse(id: String!, updateCourseInput: CreateCourseInput!): Course!
   updateLesson(id: String!, updateLessonInput: CreateLessonInput!): Lesson!
-  updateQuizz(id: String!, updateLessonInput: CreateQuizzInput!): Quizz!
+  updateSchedule(id: String!, updateScheduleInput: CreateScheduleInput!): Schedule!
+  updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
 type Query {
@@ -81,17 +97,42 @@ type Query {
   chaptersByCourseId(courseId: String!): [Chapter!]!
   course(id: String!): Course!
   courses: [Course!]!
+  getGoogleAuthUrl: String!
   lesson(id: String!): Lesson!
   lessonsByChapter(chapterId: String!): [Lesson!]!
-  quizz(id: String!): Quizz!
-  quizzesByChapter(chapterId: String!): [Quizz!]!
+  schedule(id: String!): Schedule!
+  schedulesByUser(userId: String!): [Schedule!]!
+  user(id: String!): User!
+  userByEmail(email: String!): User!
 }
 
-type Quizz {
-  chapterId: String!
+type Schedule {
   courseId: String!
-  createdAt: DateTime!
+  courseName: String!
+  days: [String!]!
+  durationWeeks: Float!
+  hoursPerSession: Float!
   id: String!
-  questionsJson: String!
-  title: String!
+  startDate: String!
+  userId: String!
+}
+
+input UpdateUserInput {
+  email: String
+  firstName: String
+  googleTokens: String
+  id: String!
+  lastName: String
+  level: Float
+  password_hash: String
+}
+
+type User {
+  email: String!
+  firstName: String!
+  googleTokens: String
+  id: String!
+  lastName: String!
+  level: Float!
+  password_hash: String!
 }

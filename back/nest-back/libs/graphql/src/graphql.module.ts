@@ -16,6 +16,9 @@ import { ConfigModule } from '@nestjs/config';
       sortSchema: true,
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      buildSchemaOptions: {
+        dateScalarMode: 'timestamp',
+      }
     }),
   ],
   exports: [GraphQLModule],

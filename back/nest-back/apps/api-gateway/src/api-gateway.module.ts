@@ -1,10 +1,16 @@
 import { Module } from '@nestjs/common';
-import { ApiGatewayController } from './api-gateway.controller';
-import { ApiGatewayService } from './api-gateway.service';
+import { UserModule } from './user/user.module';
+import { CourseModule } from './course/course.module';
+import { GraphqlModule } from '../../../libs/graphql/src/graphql.module';
+import { ScheduleModule } from './schedule/schedule.module';
+
 
 @Module({
-  imports: [],
-  controllers: [ApiGatewayController],
-  providers: [ApiGatewayService],
+  imports: [
+    GraphqlModule,
+    UserModule,
+    CourseModule,
+    ScheduleModule,
+  ],
 })
 export class ApiGatewayModule {}

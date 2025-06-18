@@ -11,6 +11,7 @@ export class CourseService {
   ) {}
 
   async create(data: Partial<Course>): Promise<Course> {
+    data.createdAt = new Date();
     const course = this.courseRepository.create(data);
     return this.courseRepository.save(course);
   }

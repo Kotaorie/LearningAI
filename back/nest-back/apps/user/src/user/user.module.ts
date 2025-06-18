@@ -3,17 +3,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './user.service';
 import { User } from '../../../../libs/database/src/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
-import { UserResolver } from './user.resolver';
+import { UserController } from './user.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
-          secret: process.env.JWT_SECRET || 'defaultSecret',
-          signOptions: { expiresIn: '1d' },
-        }),
+      secret: process.env.JWT_SECRET || 'defaultSecret',
+      signOptions: { expiresIn: '1d' },
+    }),
   ],
-  providers: [UserService, UserResolver],
+  controllers: [UserController],
+  providers: [UserService],
   exports: [UserService],
 })
 export class UserModule {}

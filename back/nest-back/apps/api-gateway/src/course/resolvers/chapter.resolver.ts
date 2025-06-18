@@ -1,23 +1,25 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { ChapterService } from './chapter.service';
-import { Chapter, CreateChapterInput } from './chapter.model';
+import { Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { Chapter, CreateChapterInput } from '../models/chapter.model';
+import { firstValueFrom } from 'rxjs';
 
 @Resolver(() => Chapter)
 export class ChapterResolver {
-    constructor(private readonly chapterService: ChapterService) {}
+    constructor(@Inject('COURSE_SERVICE') private readonly courseClient: ClientProxy) {}
 
     @Mutation(() => Chapter)
     async createChapter(
         @Args('createChapterInput') createChapterInput: CreateChapterInput,
     ): Promise<Chapter> {
-        return this.chapterService.create(createChapterInput);
+        return await firstValueFrom(this.courseClient.send('chapter.create', createChapterInput));
     }
 
     @Query(() => Chapter, { name: 'chapter' })
     async getChapter(
         @Args('id') id: string,
     ): Promise<Chapter> {
-        const chapter = await this.chapterService.findById(id);
+        const chapter = await firstValueFrom(this.courseClient.send('chapter.findById', { id }));
         if (!chapter) {
             throw new Error(`Chapter with id ${id} not found`);
         }
@@ -25,10 +27,8 @@ export class ChapterResolver {
     }
 
     @Query(() => [Chapter], { name: 'chaptersByCourseId' })
-    async getChapters(
-        @Args('courseId') courseId: string,
-    ): Promise<Chapter[]> {
-        return this.chapterService.findByCourseId(courseId);
+    async getChapters(@Args('courseId') courseId: string): Promise<Chapter[]> {
+        return firstValueFrom(this.courseClient.send('chapter.findByCourseId', { courseId }));
     }
 
     @Mutation(() => Chapter)
@@ -36,7 +36,7 @@ export class ChapterResolver {
         @Args('id') id: string,
         @Args('updateChapterInput') updateChapterInput: CreateChapterInput,
     ): Promise<Chapter> {
-        const updatedChapter = await this.chapterService.update(id, updateChapterInput);
+        const updatedChapter = await firstValueFrom(this.courseClient.send('chapter.update', { id, updateChapterInput }));
         if (!updatedChapter) {
             throw new Error(`Chapter with id ${id} not found`);
         }
@@ -44,10 +44,8 @@ export class ChapterResolver {
     }
 
     @Mutation(() => Boolean)
-    async deleteChapter(
-        @Args('id') id: string,
-    ): Promise<boolean> {
-        const result = await this.chapterService.delete(id);
+    async deleteChapter(@Args('id') id: string): Promise<boolean> {
+        const result = await firstValueFrom(this.courseClient.send('chapter.delete', { id }));
         return result.deleted; 
     }
 }

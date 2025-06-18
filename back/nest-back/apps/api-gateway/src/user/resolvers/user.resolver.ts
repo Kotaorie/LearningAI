@@ -1,21 +1,23 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { UserService } from './user.service';
-import { User, CreateUserInput, UpdateUserInput } from './user.model';
+import { Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { User, CreateUserInput, UpdateUserInput } from '../models/user.model';
+import { firstValueFrom } from 'rxjs';
 
 @Resolver(() => User)
 export class UserResolver {
-    constructor(private readonly userService: UserService) {}
+    constructor(@Inject('USER_SERVICE') private readonly userClient: ClientProxy) {}
 
     @Mutation(() => User)
     async createUser(
         @Args('createUserInput') createUserInput: CreateUserInput,
     ): Promise<User> {
-        return this.userService.create(createUserInput);
+        return await firstValueFrom(this.userClient.send('user.create', createUserInput));
     }
 
     @Query(() => User, { name: 'user' })
     async getUser(@Args('id', { type: () => String }) id: string): Promise<User> {
-        const user = await this.userService.findById(id);
+        const user = await firstValueFrom(this.userClient.send('user.findById', {id}));
         if (!user) {
             throw new Error(`User with id ${id} not found`);
         }
@@ -24,7 +26,7 @@ export class UserResolver {
 
     @Query(() => User, { name: 'userByEmail' })
     async getUserByEmail(@Args('email', { type: () => String }) email: string): Promise<User> {
-        const user = await this.userService.findByEmail(email);
+        const user = await firstValueFrom(this.userClient.send('user.findByEmail', { email }));
         if (!user) {
             throw new Error(`User with email ${email} not found`);
         }
@@ -35,7 +37,7 @@ export class UserResolver {
     async updateUser(
         @Args('updateUserInput') updateUserInput: UpdateUserInput,
     ): Promise<User> {
-        const updatedUser = await this.userService.update(updateUserInput);
+        const updatedUser = await firstValueFrom(this.userClient.send('user.update', updateUserInput));
         if (!updatedUser) {
             throw new Error(`User with id ${updateUserInput.id} not found`);
         }
@@ -44,7 +46,7 @@ export class UserResolver {
 
     @Mutation(() => Boolean)
     async deleteUser(@Args('id', { type: () => String }) id: string): Promise<boolean> {
-        const result = await this.userService.delete(id);
+        const result = await firstValueFrom(this.userClient.send('user.delete', { id }));
         return result.deleted;
     }
 }

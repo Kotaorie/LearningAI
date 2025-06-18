@@ -1,5 +1,5 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
-import { Lesson } from '../lesson/lesson.model';
+import { Lesson } from './lesson.model';
 
 @ObjectType()
 export class Chapter {
