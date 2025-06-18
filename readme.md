@@ -75,3 +75,4 @@ Projet réalisé dans le cadre du module [Projet Web – EFREI M1 DEV].
 ## Contributeur
 
 Nicolas SERVARY : nicolas.servary@efrei.net
+Tancrède CASTETS : tancrede.castets@efrei.net

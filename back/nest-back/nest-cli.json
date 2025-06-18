@@ -1,0 +1,94 @@
+{
+  "monorepo": true,
+  "root": "apps",
+  "sourceRoot": "apps",
+  "compilerOptions": {
+    "webpack": false,
+    "tsConfigPath": "tsconfig.build.json",
+    "deleteOutDir": true
+  },
+  "projects": {
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "course-service": {
+      "type": "application",
+      "root": "apps/course-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/course-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/course-service/tsconfig.app.json"
+      }
+    },
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "google-calendar": {
+      "type": "library",
+      "root": "libs/google-calendar",
+      "entryFile": "index",
+      "sourceRoot": "libs/google-calendar/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/google-calendar/tsconfig.lib.json"
+      }
+    },
+    "graphql": {
+      "type": "library",
+      "root": "libs/graphql",
+      "entryFile": "index",
+      "sourceRoot": "libs/graphql/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/graphql/tsconfig.lib.json"
+      }
+    },
+    "notification-service": {
+      "type": "application",
+      "root": "apps/notification-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification-service/tsconfig.app.json"
+      }
+    },
+    "schedule": {
+      "type": "application",
+      "root": "apps/schedule",
+      "entryFile": "main",
+      "sourceRoot": "apps/schedule/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/schedule/tsconfig.app.json"
+      }
+    },
+    "schedule-service": {
+      "type": "application",
+      "root": "apps/schedule-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/schedule-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/schedule-service/tsconfig.app.json"
+      }
+    },
+    "user-service": {
+      "type": "application",
+      "root": "apps/user-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/user-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "./tsconfig.build.json",
+        "outputPath": "dist/apps/user-service"
+      }
+    }
+  }
+}
