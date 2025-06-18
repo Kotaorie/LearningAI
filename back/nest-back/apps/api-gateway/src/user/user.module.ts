@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AuthResolver } from './resolvers/auth.resolver';
+import { AuthResolver } from '../auth/auth.resolver';
 import { UserResolver } from './resolvers/user.resolver';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 

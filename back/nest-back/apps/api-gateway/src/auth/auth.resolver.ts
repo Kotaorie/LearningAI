@@ -1,24 +1,21 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { Inject } from '@nestjs/common';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Inject, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { User } from '../models/user.model';
+import { User } from '../user/models/user.model';
 import { firstValueFrom } from 'rxjs';
+import { AuthGuard } from './guards/auth.guard';
 
 @Resolver(() => User)
 export class AuthResolver {
     constructor(@Inject('USER_SERVICE') private readonly userClient: ClientProxy) {}
 
-    @Query(() => String)
-    async getGoogleAuthUrl(): Promise<string> {
-        return await firstValueFrom(this.userClient.send('auth.getGoogleAuthUrl', {}));
-    }
-
     @Mutation(() => Boolean)
+    @UseGuards(AuthGuard)
     async handleGoogleCallback(
         @Args('code') code: string,
-        @Args('userId') userId: string,
+        @Context() context: any,
     ): Promise<boolean> {
-        const result = await firstValueFrom(this.userClient.send('auth.handleGoogleCallBack',{code, userId}));
+        const result = await firstValueFrom(this.userClient.send('auth.handleGoogleCallBack',{code, userId: context.req.user.sub}));
         return result.success;
     }
 

@@ -10,7 +10,7 @@ import { AuthController } from './auth.controller';
     UserModule,
     GoogleCalendarModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'defaultSecret',
+      secret: process.env.JWT_SECRET || 'jpp_secret',
       signOptions: { expiresIn: '1d' },
     }),
   ],

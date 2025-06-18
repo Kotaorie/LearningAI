@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Course } from '../../../../libs/database/src/entities/course.entity';
+import { Groq } from 'groq-sdk';
 
 @Injectable()
 export class CourseService {
@@ -11,7 +12,27 @@ export class CourseService {
   ) {}
 
   async create(data: Partial<Course>): Promise<Course> {
+    console.log('Creating course with data:', data);
     data.createdAt = new Date();
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY  });
+    var content = ''
+    const chatCompletion = await groq.chat.completions.create({
+      "messages": [
+        {
+          "role": "user",
+          "content": "Tu est un ensegnant passioné par le/l' "+data.type+" avec énormement de connaisance sur "+data.type+". rédige moi une structure de cours pour une duré de 2mois avec 4h de cours par semaine. Mon but est d'acquerir des connaissances sur"+data.sujet+". Les cours sont composé de chapitre et de lesson.\n\nJe veux un resultat utilisant la structure suivante : \n\ntitre du cours \n\ndescription gloabl\n\nChapitre 1 \n\n - leçon 1.1\n - leçon 1.2\n\nChaptire 2 \n\n... \n\n Le tout en français"
+        }
+      ],
+      "model": "llama3-8b-8192",
+      "temperature": 0.4,
+      "max_completion_tokens": 1024,
+      "top_p": 1,
+      "stream": true,
+      "stop": null
+    });
+    for await (const chunk of chatCompletion) {
+      content += chunk.choices[0]?.delta?.content || '';
+    }
     const course = this.courseRepository.create(data);
     return this.courseRepository.save(course);
   }
@@ -43,4 +64,6 @@ export class CourseService {
     }
     return { deleted: result.affected > 0 };
   }
+
+  //
 }
