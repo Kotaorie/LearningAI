@@ -64,7 +64,7 @@ jobs:
       - name: Build and push user microservice
         uses: docker/build-push-action@v5
         with:
-          context: ./back/nest-back/user
+          context: ./back/nest-back/apps/user
           file: ./back/nest-back/Dockerfile.user
           push: true
           tags: ${{ steps.meta-user.outputs.tags }}
@@ -84,7 +84,7 @@ jobs:
       - name: Build and push course microservice
         uses: docker/build-push-action@v5
         with:
-          context: ./back/nest-back/course
+          context: ./back/nest-back/apps/course
           file: ./back/nest-back/Dockerfile.course
           push: true
           tags: ${{ steps.meta-course.outputs.tags }}
@@ -104,7 +104,7 @@ jobs:
       - name: Build and push schedule microservice
         uses: docker/build-push-action@v5
         with:
-          context: ./back/nest-back/schedule
+          context: ./back/nest-back/apps/schedule
           file: ./back/nest-back/Dockerfile.schedule
           push: true
           tags: ${{ steps.meta-schedule.outputs.tags }}
