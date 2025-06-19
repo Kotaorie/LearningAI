@@ -4,6 +4,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { User } from '../user/models/user.model';
 import { firstValueFrom } from 'rxjs';
 import { AuthGuard } from './guards/auth.guard';
+import { AuthResponse } from './auth.model';
 
 @Resolver(() => User)
 export class AuthResolver {
@@ -19,7 +20,7 @@ export class AuthResolver {
         return result.success;
     }
 
-    @Mutation(() => String)
+    @Mutation(() => AuthResponse)
     async login(
         @Args('email') email: string,
         @Args('password') password: string,

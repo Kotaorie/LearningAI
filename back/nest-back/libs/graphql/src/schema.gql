@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AuthResponse {
+  access_token: String!
+  google_auth_url: String!
+}
+
 type Chapter {
   courseId: String!
   id: String!
@@ -60,7 +65,7 @@ type Mutation {
   deleteUser: Boolean!
   generateChapter(chapterId: String!, id: String!): Chapter!
   handleGoogleCallback(code: String!): Boolean!
-  login(email: String!, password: String!): String!
+  login(email: String!, password: String!): AuthResponse!
   updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
