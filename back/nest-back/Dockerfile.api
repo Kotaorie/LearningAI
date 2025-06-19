@@ -10,7 +10,7 @@ RUN npm ci
 ARG NODE_ENV=development
 ENV NODE_ENV=$NODE_ENV
 
-COPY apps ../../apps libs ../../libs
+COPY ../../apps ./apps ../../libs ./libs
 
 # Stage de développement
 FROM base AS development
