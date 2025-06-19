@@ -4,7 +4,6 @@ import { UserService } from './user.service';
 import { User } from '../../../../libs/database/src/entities/user.entity';
 import { UserController } from './user.controller';
 import { DatabaseModule } from '../../../../libs/database/src/database.module';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
