@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LessonService } from './lesson.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Lesson } from '../../../../libs/database/src/entities/lesson.entity';
+import { CourseType } from '../../../../libs/database/src/entities/course.entity';
 import { Repository } from 'typeorm';
 
 describe('LessonService', () => {
@@ -15,6 +16,9 @@ describe('LessonService', () => {
     level: 2,
     status: 'finish',
     createdAt: new Date('2024-11-12'),
+    chapters: [],
+    type: CourseType.code,
+    sujet: 'informatique', 
   };
 
   const mockChapter = {
@@ -62,7 +66,7 @@ describe('LessonService', () => {
   it('should create a lesson', async () => {
     const result = await service.create({ title: 'Intro' });
     expect(result).toEqual(mockLesson);
-    expect(repo.create).toHaveBeenCalledWith({ title: 'Intro' });
+    expect(repo.create).toHaveBeenCalledWith({ title: 'Intro', contentMarkdown: '' });
     expect(repo.save).toHaveBeenCalled();
   });
 

@@ -4,25 +4,24 @@ import { Schedule } from '../../../libs/database/src/entities/schedule.entity';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { GoogleCalendarService } from '../../../libs/google-calendar/src/google-calendar.service';
-import { UserService } from '../../user/src/user/user.service';
+import { User } from '../../../libs/database/src/entities/user.entity';
 
 describe('ScheduleService', () => {
   let service: ScheduleService;
   let repo: Repository<Schedule>;
-  let userService: UserService;
+  let userRepo: Repository<User>;
   let googleCalendarService: GoogleCalendarService;
 
   const mockSchedule: Schedule = {
-  id: '1',
-  userId: '4',
-  courseName: 'Test Course',
-  courseId: 'C1', 
-  startDate: '2025-04-01',
-  durationWeeks: 4,
-  days: ['Monday', 'Wednesday'], 
-  hoursPerSession: 2,            
-};
-
+    id: '1',
+    userId: '4',
+    courseName: 'Test Course',
+    courseId: 'C1',
+    startDate: '2025-04-01',
+    durationWeeks: 4,
+    days: ['Monday', 'Wednesday'],
+    hoursPerSession: 2,
+  } as Schedule;
 
   const mockUser = {
     id: '4',
@@ -38,8 +37,8 @@ describe('ScheduleService', () => {
     delete: jest.fn().mockResolvedValue({ affected: 1 }),
   };
 
-  const mockUserService = {
-    findById: jest.fn().mockResolvedValue(mockUser),
+  const mockUserRepo = {
+    findOne: jest.fn().mockResolvedValue(mockUser),
   };
 
   const mockGoogleCalendarService = {
@@ -51,15 +50,17 @@ describe('ScheduleService', () => {
       providers: [
         ScheduleService,
         { provide: getRepositoryToken(Schedule), useValue: mockRepo },
+        { provide: getRepositoryToken(User), useValue: mockUserRepo },
         { provide: GoogleCalendarService, useValue: mockGoogleCalendarService },
-        { provide: UserService, useValue: mockUserService },
       ],
     }).compile();
 
     service = module.get<ScheduleService>(ScheduleService);
     repo = module.get<Repository<Schedule>>(getRepositoryToken(Schedule));
-    userService = module.get<UserService>(UserService);
+    userRepo = module.get<Repository<User>>(getRepositoryToken(User));
     googleCalendarService = module.get<GoogleCalendarService>(GoogleCalendarService);
+
+    jest.clearAllMocks();
   });
 
   it('should create a schedule and add to Google Calendar', async () => {
@@ -71,32 +72,30 @@ describe('ScheduleService', () => {
       days: ['Monday', 'Wednesday'], 
       hoursPerSession: 2, 
     };
-    
 
     const result = await service.createSchedule(input);
     expect(result).toEqual(mockSchedule);
     expect(repo.create).toHaveBeenCalledWith(input);
     expect(repo.save).toHaveBeenCalled();
-    expect(userService.findById).toHaveBeenCalledWith('4');
+    expect(userRepo.findOne).toHaveBeenCalledWith({ where: { id: '4' } }); // Correction ici
     expect(googleCalendarService.addEvent).toHaveBeenCalled();
   });
 
   it('should log error and continue if Google Calendar event creation fails', async () => {
-  mockGoogleCalendarService.addEvent.mockRejectedValueOnce(new Error('Calendar error'));
+    mockGoogleCalendarService.addEvent.mockRejectedValueOnce(new Error('Calendar error'));
 
-  const result = await service.createSchedule({
-    userId: '4',
-    courseName: 'Test Course',
-    startDate: '2025-04-01',
-    durationWeeks: 4,
-    days: ['Monday'],
-    hoursPerSession: 2,
+    const result = await service.createSchedule({
+      userId: '4',
+      courseName: 'Test Course',
+      startDate: '2025-04-01',
+      durationWeeks: 4,
+      days: ['Monday'],
+      hoursPerSession: 2,
+    });
+
+    expect(result).toEqual(mockSchedule);
+    expect(googleCalendarService.addEvent).toHaveBeenCalled();
   });
-
-  expect(result).toEqual(mockSchedule);
-  expect(googleCalendarService.addEvent).toHaveBeenCalled();
-});
-
 
   it('should throw if userId is missing', async () => {
     await expect(service.createSchedule({})).rejects.toThrow('userId is required to create a schedule');

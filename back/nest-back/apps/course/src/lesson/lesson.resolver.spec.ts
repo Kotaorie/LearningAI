@@ -1,24 +1,30 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LessonResolver } from './lesson.resolver';
+import { LessonController } from './lesson.controller';
 import { LessonService } from './lesson.service';
 
-describe('lessonController', () => {
-  let resolver: LessonResolver;
+const mockChannel = { ack: jest.fn() };
+const mockMsg = {};
+const mockContext = {
+  getChannelRef: () => mockChannel,
+  getMessage: () => mockMsg,
+};
+
+describe('LessonController', () => {
+  let controller: LessonController;
   let service: LessonService;
 
-  const mockLesson = { id: 1, title: 'Intro', course_id: 1, position: 1 };
+  const mockLesson = { id: '1', title: 'Intro', chapterId: '1', position: 1, contentMarkdown: 'texte test' };
 
   const mockService = {
-    create: jest.fn().mockResolvedValue(mockLesson),
     findById: jest.fn().mockResolvedValue(mockLesson),
     findByChapterId: jest.fn().mockResolvedValue([mockLesson]),
     update: jest.fn().mockResolvedValue(mockLesson),
-    delete: jest.fn().mockResolvedValue(mockLesson),
+    delete: jest.fn().mockResolvedValue({ deleted: true }),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [LessonResolver],
+      controllers: [LessonController],
       providers: [
         {
           provide: LessonService,
@@ -27,51 +33,49 @@ describe('lessonController', () => {
       ],
     }).compile();
 
-    resolver = module.get<LessonResolver>(LessonResolver);
+    controller = module.get<LessonController>(LessonController);
     service = module.get<LessonService>(LessonService);
-  });
 
- it('should create a lesson', async () => {
-    const input = {
-      id: '1',
-      title: 'Intro',
-      chapterId: '1',
-      position: 1,
-      contentMarkdown: 'texte test',
-    };
-    const result = await resolver.createLesson(input);
-    expect(result).toEqual(mockLesson);
-    expect(mockService.create).toHaveBeenCalledWith(input);
+    jest.clearAllMocks();
   });
-
 
   it('should return a lesson by ID', async () => {
-    const result = await resolver.getLesson('1');
+    const payload = { id: '1' };
+    const result = await controller.getLesson(payload, mockContext as any);
     expect(result).toEqual(mockLesson);
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(mockService.findById).toHaveBeenCalledWith('1');
   });
 
-  it('should return lessons by course ID', async () => {
-    const result = await resolver.getLessonsByChapterId('1');
+  it('should return lessons by chapter ID', async () => {
+    const payload = { chapterId: '1' };
+    const result = await controller.getLessonsByChapterId(payload, mockContext as any);
     expect(result).toEqual([mockLesson]);
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(mockService.findByChapterId).toHaveBeenCalledWith('1');
   });
-  
+
   it('should update a lesson', async () => {
-    const updateInput = {
-  id: '1',
-  title: 'New Title',
-  chapterId: '2',         
-  position: 1,           
-  contentMarkdown: 'texte test', 
-};
-
-  const result = await resolver.updateLesson('1', updateInput);
-  expect(result).toEqual(mockLesson);
-  expect(mockService.update).toHaveBeenCalledWith('1', updateInput);
-
+    const payload = {
+      id: '1',
+      updateLessonInput: {
+        title: 'New Title',
+        chapterId: '2',
+        position: 1,
+        contentMarkdown: 'texte test',
+      },
+    };
+    const result = await controller.updateLesson(payload, mockContext as any);
+    expect(result).toEqual(mockLesson);
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(mockService.update).toHaveBeenCalledWith('1', payload.updateLessonInput);
   });
 
   it('should delete a lesson', async () => {
-    await resolver.deleteLesson('1');
+    const payload = { id: '1' };
+    const result = await controller.deleteLesson(payload, mockContext as any);
+    expect(result).toEqual({ deleted: true });
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
     expect(mockService.delete).toHaveBeenCalledWith('1');
   });
 });
