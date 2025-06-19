@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
+import { AppUserModule } from '../src/app.module';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
@@ -9,7 +9,7 @@ describe('UserController (e2e)', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppUserModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -19,14 +19,7 @@ describe('UserController (e2e)', () => {
   afterAll(async () => {
     await app.close();
   });
-
-  it('/ (GET)', () => {
-      return request(app.getHttpServer())
-        .get('/')
-        .expect(200)
-        .expect('Hello World!');
-  });
-
+  
   it('POST /user/create - create user', async () => {
     const res = await request(app.getHttpServer())
       .post('/user')
