@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   postgres-db:
     image: postgres:15-alpine
@@ -11,7 +12,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
-      # - ./back/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - dev_network
     restart: unless-stopped
@@ -20,6 +20,72 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.11-management-alpine
+    container_name: rabbitmq_dev
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    networks:
+      - dev_network
+    restart: unless-stopped
+
+  user:
+    build:
+      context: ./back/nest-back
+      dockerfile: Dockerfile.user
+      target: development
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-devuser}:${POSTGRES_PASSWORD:-devpassword}@postgres-db:5432/${POSTGRES_DB:-learningai_dev}
+    networks:
+      - dev_network
+    restart: unless-stopped
+
+  course:
+    build:
+      context: ./back/nest-back
+      dockerfile: Dockerfile.course
+      target: development
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-devuser}:${POSTGRES_PASSWORD:-devpassword}@postgres-db:5432/${POSTGRES_DB:-learningai_dev}
+    networks:
+      - dev_network
+    restart: unless-stopped
+
+  schedule:
+    build:
+      context: ./back/nest-back
+      dockerfile: Dockerfile.schedule
+      target: development
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-devuser}:${POSTGRES_PASSWORD:-devpassword}@postgres-db:5432/${POSTGRES_DB:-learningai_dev}
+    networks:
+      - dev_network
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ./back/nest-back
+      dockerfile: Dockerfile.api
+      target: development
+    ports:
+      - "3001:3001"
+    networks:
+      - dev_network
+    restart: unless-stopped
 
 volumes:
   postgres_dev_data:
