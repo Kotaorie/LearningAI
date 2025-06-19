@@ -27,16 +27,16 @@ export class ScheduleService {
     }
     const newSchedule = this.scheduleRepository.create(schedule);
     const saved = await this.scheduleRepository.save(newSchedule);
-
-    const user = await this.getUserById(saved.userId);
-    const endDate = new Date(saved.startDate + saved.durationWeeks * 7 * 24 * 60 * 60 * 1000);
+    const user = await this.userService.findById(schedule.userId);
+    const startDate = new Date(saved.startDate);
+    const endDate = new Date(startDate.getTime() + saved.durationWeeks * 7 * 24 * 60 * 60 * 1000);
     if (user?.googleTokens) {
       try {
         await this.googleCalendarService.addEvent(
           user.googleTokens,
           {
             summary: saved.courseName ?? 'Tâche',
-            start: saved.startDate.toString(),
+            start: startDate.toString(),
             end: endDate.toISOString(),
           }
         );

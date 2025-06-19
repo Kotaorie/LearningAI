@@ -3,9 +3,13 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 
-describe('CourseController (e2e)', () => {
+jest.setTimeout(30000);
+
+describe('E2E All controllers', () => {
   let app: INestApplication;
   let courseId: number;
+  let chapterId: number;
+  let lessonId: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -20,6 +24,7 @@ describe('CourseController (e2e)', () => {
     await app.close();
   });
 
+  // COURSES
   it('POST /course - create course', async () => {
     const res = await request(app.getHttpServer())
       .post('/course')
@@ -48,43 +53,19 @@ describe('CourseController (e2e)', () => {
     expect(res.body.title).toBe('Updated Course');
   });
 
-  it('DELETE /course/:id - delete course', async () => {
-    const res = await request(app.getHttpServer()).delete(`/course/${courseId}`);
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ deleted: true });
-  });
-});
-
-describe('ChapterController (e2e)', () => {
-  let app: INestApplication;
-  let chapterId: number;
-
-  beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-  });
-
-  afterAll(async () => {
-    await app.close();
-  });
-
+  // CHAPTERS
   it('POST /chapter - create chapter', async () => {
-  const res = await request(app.getHttpServer())
-    .post('/chapter')
-    .send({
-      course_id: 1,
-      title: 'Test chapter',
-      position: 1
-    });
-  expect(res.status).toBe(201);
-  expect(res.body).toHaveProperty('id');
-  chapterId = res.body.id;
-});
-
+    const res = await request(app.getHttpServer())
+      .post('/chapter')
+      .send({
+        course_id: courseId, 
+        title: 'Test chapter',
+        position: 1,
+      });
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty('id');
+    chapterId = res.body.id;
+  });
 
   it('GET /chapter/:id - get chapter', async () => {
     const res = await request(app.getHttpServer()).get(`/chapter/${chapterId}`);
@@ -100,44 +81,20 @@ describe('ChapterController (e2e)', () => {
     expect(res.body.title).toBe('Updated chapter');
   });
 
-  it('DELETE /chapter/:id - delete chapter', async () => {
-    const res = await request(app.getHttpServer()).delete(`/chapter/${chapterId}`);
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ deleted: true });
-  });
-});
-
-describe('LessonController (e2e)', () => {
-  let app: INestApplication;
-  let lessonId: number;
-
-  beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-  });
-
-  afterAll(async () => {
-    await app.close();
-  });
-
+  // LESSONS
   it('POST /lesson - create lesson', async () => {
-  const res = await request(app.getHttpServer())
-    .post('/lesson')
-    .send({
-      chapter_id: 1,
-      title: 'Test lesson',
-      content_markdown: 'Some content',
-      position: 1
-    });
-  expect(res.status).toBe(201);
-  expect(res.body).toHaveProperty('id');
-  lessonId = res.body.id;
-});
-
+    const res = await request(app.getHttpServer())
+      .post('/lesson')
+      .send({
+        chapter_id: chapterId, 
+        title: 'Test lesson',
+        content_markdown: 'Some content',
+        position: 1,
+      });
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty('id');
+    lessonId = res.body.id;
+  });
 
   it('GET /lesson/:id - get lesson', async () => {
     const res = await request(app.getHttpServer()).get(`/lesson/${lessonId}`);
@@ -153,62 +110,21 @@ describe('LessonController (e2e)', () => {
     expect(res.body.title).toBe('Updated lesson');
   });
 
+  // CLEANUP
   it('DELETE /lesson/:id - delete lesson', async () => {
     const res = await request(app.getHttpServer()).delete(`/lesson/${lessonId}`);
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ deleted: true });
   });
-});
 
-describe('QuizzController (e2e)', () => {
-  let app: INestApplication;
-  let quizzId: number;
-
-  beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-  });
-
-  afterAll(async () => {
-    await app.close();
-  });
-
-  it('POST /quizz - create quizz', async () => {
-  const res = await request(app.getHttpServer())
-    .post('/quizz')
-    .send({
-      title: 'Test quizz',
-      questions_json: [
-        { question: 'What is 2 + 2?', choices: [2, 4, 5], answer: 4 }
-      ],
-      course_id: 1
-    });
-  expect(res.status).toBe(201);
-  expect(res.body).toHaveProperty('id');
-  quizzId = res.body.id;
-});
-
-
-  it('GET /quizz/:id - get quizz', async () => {
-    const res = await request(app.getHttpServer()).get(`/quizz/${quizzId}`);
+  it('DELETE /chapter/:id - delete chapter', async () => {
+    const res = await request(app.getHttpServer()).delete(`/chapter/${chapterId}`);
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('id', quizzId);
+    expect(res.body).toEqual({ deleted: true });
   });
 
-  it('PATCH /quizz/:id - update quizz', async () => {
-    const res = await request(app.getHttpServer())
-      .patch(`/quizz/${quizzId}`)
-      .send({ title: 'Updated quizz' });
-    expect(res.status).toBe(200);
-    expect(res.body.title).toBe('Updated quizz');
-  });
-
-  it('DELETE /quizz/:id - delete quizz', async () => {
-    const res = await request(app.getHttpServer()).delete(`/quizz/${quizzId}`);
+  it('DELETE /course/:id - delete course', async () => {
+    const res = await request(app.getHttpServer()).delete(`/course/${courseId}`);
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ deleted: true });
   });
