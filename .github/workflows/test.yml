@@ -45,8 +45,18 @@ jobs:
         run: npm ci
         working-directory: ./back/nest-back
 
-      # from rest to graphql so test don't work anymore
-      
-      # - name: Run user-service tests
-      #   run: npm run test:userservice
-      #   working-directory: ./back/nest-back
+      - name: Run user-service tests
+        run: npm run test:user
+        working-directory: ./back/nest-back
+
+      - name: Run api-gateway tests
+        run: npm run test:api
+        working-directory: ./back/nest-back
+
+      - name: Run course-service tests
+        run: npm run test:course
+        working-directory: ./back/nest-back
+
+      - name: Run schedule-service tests
+        run: npm run test:schedule
+        working-directory: ./back/nest-back
