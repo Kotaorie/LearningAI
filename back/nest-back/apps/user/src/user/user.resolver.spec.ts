@@ -1,98 +1,109 @@
+jest.mock('bcrypt', () => ({
+  genSalt: jest.fn().mockResolvedValue('mockSalt'),
+  hash: jest.fn().mockResolvedValue('hashedpass'),
+  compare: jest.fn(),
+}));
+
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
-import { CreateUserInput, UpdateUserInput } from './user.model';
+import { User } from '../../../../libs/database/src/entities/user.entity';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 
-describe('UserResolver', () => {
-  let resolver: UserResolver;
+describe('UserService', () => {
   let service: UserService;
+  let repo: Repository<User>;
 
-  const mockUser = {
+  const mockUser: User = {
     id: '1',
     email: 'test@example.com',
     firstName: 'John',
     lastName: 'Doe',
-    password_hash: 'hashed-password',
+    password_hash: 'hashedpassword',
+    googleTokens: 'null',  
     level: 3,
-    googleTokens: null,
   };
 
-  const mockService = {
-    create: jest.fn().mockResolvedValue(mockUser),
-    findById: jest.fn().mockResolvedValue(mockUser),
-    findByEmail: jest.fn().mockResolvedValue(mockUser),
-    update: jest.fn().mockResolvedValue(mockUser),
-    delete: jest.fn().mockResolvedValue({ deleted: true }),
+  const mockRepo = {
+    findOne: jest.fn().mockResolvedValue(mockUser),
+    create: jest.fn().mockImplementation(dto => dto),
+    save: jest.fn().mockResolvedValue(mockUser),
+    update: jest.fn().mockResolvedValue(undefined),
+    delete: jest.fn().mockResolvedValue({ affected: 1 }),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UserResolver,
+        UserService,
         {
-          provide: UserService,
-          useValue: mockService,
+          provide: getRepositoryToken(User),
+          useValue: mockRepo,
         },
       ],
     }).compile();
 
-    resolver = module.get<UserResolver>(UserResolver);
     service = module.get<UserService>(UserService);
+    repo = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
-  it('should create a user', async () => {
-    const input: CreateUserInput = {
-      email: 'test@example.com',
-      firstName: 'John',
-      lastName: 'Doe',
-      password_hash: 'password123',
-      level:2,
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should find user by email', async () => {
+    const result = await service.findByEmail('test@example.com');
+    expect(result).toEqual(mockUser);
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { email: 'test@example.com' } });
+  });
+
+  it('should find user by ID', async () => {
+    const result = await service.findById('1');
+    expect(result).toEqual(mockUser);
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { id: '1' } });
+  });
+
+  it('should create a user and hash password', async () => {
+    const input = {
+      email: 'new@example.com',
+      password_hash: 'plainpass',
     };
-    const result = await resolver.createUser(input);
+
+    const result = await service.create(input);
+
     expect(result).toEqual(mockUser);
-    expect(service.create).toHaveBeenCalledWith(input);
+    expect(repo.create).toHaveBeenCalled();
+    expect(repo.save).toHaveBeenCalled();
+    expect(bcrypt.hash).toHaveBeenCalledWith('plainpass', 'mockSalt');
   });
 
-  it('should return a user by ID', async () => {
-    const result = await resolver.getUser('1');
+  it('should update a user and hash password if present', async () => {
+    const password = 'newpass';
+    const hashSpy = jest.spyOn(bcrypt, 'hash').mockResolvedValueOnce('newhashed');
+
+    const result = await service.update({ id: '1', password_hash: password });
     expect(result).toEqual(mockUser);
-    expect(service.findById).toHaveBeenCalledWith('1');
-  });
-
-  it('should throw if user by ID not found', async () => {
-    mockService.findById.mockResolvedValueOnce(null);
-    await expect(resolver.getUser('404')).rejects.toThrow('User with id 404 not found');
-  });
-
-  it('should return a user by email', async () => {
-    const result = await resolver.getUserByEmail('test@example.com');
-    expect(result).toEqual(mockUser);
-    expect(service.findByEmail).toHaveBeenCalledWith('test@example.com');
-  });
-
-  it('should throw if user by email not found', async () => {
-    mockService.findByEmail.mockResolvedValueOnce(null);
-    await expect(resolver.getUserByEmail('not@found.com')).rejects.toThrow('User with email not@found.com not found');
-  });
-
-  it('should update a user', async () => {
-    const input: UpdateUserInput = {
+    expect(repo.update).toHaveBeenCalledWith('1', {
       id: '1',
-      firstName: 'Jane',
-    };
-    const result = await resolver.updateUser(input);
-    expect(result).toEqual(mockUser);
-    expect(service.update).toHaveBeenCalledWith(input);
+      password_hash: 'newhashed',
+    });
+    expect(hashSpy).toHaveBeenCalled();
   });
 
-  it('should throw if update target not found', async () => {
-    mockService.update.mockResolvedValueOnce(null);
-    await expect(resolver.updateUser({ id: '999' })).rejects.toThrow('User with id 999 not found');
+  it('should throw if no ID is provided for update', async () => {
+    await expect(service.update({ email: 'abc' })).rejects.toThrow('User ID is required for update');
+  });
+
+  it('should update google tokens', async () => {
+    const tokens = { access_token: 'abc123' };
+    await service.updateGoogleTokens('1', tokens);
+    expect(repo.update).toHaveBeenCalledWith('1', { googleTokens: tokens });
   });
 
   it('should delete a user', async () => {
-    const result = await resolver.deleteUser('1');
-    expect(result).toBe(true);
-    expect(service.delete).toHaveBeenCalledWith('1');
+    const result = await service.delete('1');
+    expect(result).toEqual({ deleted: true });
+    expect(repo.delete).toHaveBeenCalledWith('1');
   });
 });

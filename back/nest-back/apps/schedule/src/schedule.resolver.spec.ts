@@ -1,22 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ScheduleResolver } from './schedule.resolver';
+import { ScheduleController } from './schedule.controller';
 import { ScheduleService } from './schedule.service';
+import { UnauthorizedException } from '@nestjs/common';
 
-describe('ScheduleResolver', () => {
-  let resolver: ScheduleResolver;
+const mockChannel = { ack: jest.fn() };
+const mockMsg = {};
+const mockContext = {
+  getChannelRef: () => mockChannel,
+  getMessage: () => mockMsg,
+};
+describe('ScheduleController', () => {
+  let controller: ScheduleController;
   let service: ScheduleService;
 
   const mockSchedule = {
-  id: '1',
-  userId: '4',
-  courseId: '2',
-  courseName: 'GraphQL course',
-  days: ['Monday', 'Wednesday'],
-  hoursPerSession: 2,
-  durationWeeks: 4,
-  startDate: '2025-06-01',
-};
-
+    id: '1',
+    userId: '4',
+    courseId: '2',
+    courseName: 'GraphQL course',
+    days: ['Monday', 'Wednesday'],
+    hoursPerSession: 2,
+    durationWeeks: 4,
+    startDate: '2025-06-01',
+  };
 
   const mockService = {
     createSchedule: jest.fn().mockResolvedValue(mockSchedule),
@@ -28,8 +34,8 @@ describe('ScheduleResolver', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [ScheduleController],
       providers: [
-        ScheduleResolver,
         {
           provide: ScheduleService,
           useValue: mockService,
@@ -37,50 +43,65 @@ describe('ScheduleResolver', () => {
       ],
     }).compile();
 
-    resolver = module.get<ScheduleResolver>(ScheduleResolver);
+    controller = module.get<ScheduleController>(ScheduleController);
     service = module.get<ScheduleService>(ScheduleService);
+
+    jest.clearAllMocks();
   });
 
   it('should create a schedule', async () => {
-    const input = { title: 'test', user_id: '4' };
-    const result = await resolver.createSchedule(input as any);
+    const payload = { createScheduleInput: { courseName: 'test' }, userId: '4' };
+    const result = await controller.createSchedule(payload, mockContext as any);
     expect(result).toEqual(mockSchedule);
-    expect(service.createSchedule).toHaveBeenCalledWith(input);
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(mockService.createSchedule).toHaveBeenCalledWith({ ...payload.createScheduleInput, userId: '4' });
   });
 
-  it('should return a schedule by ID', async () => {
-    const result = await resolver.getSchedule('1');
+  it('should return a schedule by ID (authorized)', async () => {
+    const payload = { id: '1', userId: '4' };
+    const result = await controller.getSchedule(payload, mockContext as any);
     expect(result).toEqual(mockSchedule);
-    expect(service.getSchedule).toHaveBeenCalledWith('1');
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(mockService.getSchedule).toHaveBeenCalledWith('1');
   });
 
-  it('should throw an error if schedule not found', async () => {
-    mockService.getSchedule.mockResolvedValueOnce(null);
-    await expect(resolver.getSchedule('data_service')).rejects.toThrow('Schedule with id data_service not found');
+  it('should throw Unauthorized if not the owner on getSchedule', async () => {
+    mockService.getSchedule.mockResolvedValueOnce({ ...mockSchedule, userId: 'other' });
+    const payload = { id: '1', userId: '4' };
+    await expect(controller.getSchedule(payload, mockContext as any)).rejects.toThrow(UnauthorizedException);
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
   });
 
   it('should return schedules by user ID', async () => {
-    const result = await resolver.getSchedulesByUserId('4');
+    const payload = { userId: '4' };
+    const result = await controller.getSchedulesByUserId(payload, mockContext as any);
     expect(result).toEqual([mockSchedule]);
-    expect(service.getSchedulesByUserId).toHaveBeenCalledWith('4');
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(mockService.getSchedulesByUserId).toHaveBeenCalledWith('4');
   });
 
   it('should update a schedule', async () => {
-    const input = { title: 'Updated Title' };
-    const result = await resolver.updateSchedule('1', input as any);
+    const payload = { id: '1', updateScheduleInput: { courseName: 'Updated Title' } };
+    const result = await controller.updateSchedule(payload, mockContext as any);
     expect(result).toEqual(mockSchedule);
-    expect(service.updateSchedule).toHaveBeenCalledWith('1', input);
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(mockService.updateSchedule).toHaveBeenCalledWith('1', { courseName: 'Updated Title' });
   });
 
-  it('should throw an error if update target not found', async () => {
-    mockService.updateSchedule.mockResolvedValueOnce(null);
-    await expect(resolver.updateSchedule('999', { title: 'New' } as any))
-      .rejects.toThrow('Schedule with id 999 not found');
+  it('should delete a schedule and return result if user is owner', async () => {
+    mockService.getSchedule.mockResolvedValueOnce({ ...mockSchedule, userId: '4' });
+    const payload = { id: '1', userId: '4' };
+    const result = await controller.deleteSchedule(payload, mockContext as any);
+    expect(result).toEqual({ deleted: true });
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(mockService.deleteSchedule).toHaveBeenCalledWith('1');
   });
 
-  it('should delete a schedule and return true', async () => {
-    const result = await resolver.deleteSchedule('1');
-    expect(result).toBe(true);
-    expect(service.deleteSchedule).toHaveBeenCalledWith('1');
+  it('should throw Unauthorized if user is not owner on delete', async () => {
+
+    mockService.getSchedule.mockResolvedValueOnce({ ...mockSchedule, userId: 'other' });
+    const payload = { id: '1', userId: '4' };
+    await expect(controller.deleteSchedule(payload, mockContext as any)).rejects.toThrow(UnauthorizedException);
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
   });
 });

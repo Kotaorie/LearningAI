@@ -27,7 +27,7 @@ export class ScheduleService {
     }
     const newSchedule = this.scheduleRepository.create(schedule);
     const saved = await this.scheduleRepository.save(newSchedule);
-    const user = await this.getUserById(schedule.userId);
+    const user = await this.userRepository.findOne({ where: { id: schedule.userId } });
     const startDate = new Date(saved.startDate);
     const endDate = new Date(startDate.getTime() + saved.durationWeeks * 7 * 24 * 60 * 60 * 1000);
     if (user?.googleTokens) {

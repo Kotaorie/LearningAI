@@ -1,15 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthResolver } from './auth.resolver';
+import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
 
-describe('AuthResolver', () => {
-  let resolver: AuthResolver;
-  let authService: AuthService;
+// Mock RmqContext
+const mockChannel = { ack: jest.fn() };
+const mockMsg = {};
+const mockContext = {
+  getChannelRef: () => mockChannel,
+  getMessage: () => mockMsg,
+};
+
+describe('AuthController', () => {
+  let controller: AuthController;
+  let service: AuthService;
 
   const mockAuthService = {
     getGoogleAuthUrl: jest.fn().mockResolvedValue('https://auth.google.com/redirect'),
-    handleGoogleCallback: jest.fn().mockResolvedValue({ success: true }),
+    handleGoogleCallBack: jest.fn().mockResolvedValue({ success: true }),
     login: jest.fn().mockResolvedValue({
       access_token: 'abc123',
       google_auth_url: 'https://auth.google.com/redirect',
@@ -18,38 +25,42 @@ describe('AuthResolver', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [AuthController],
       providers: [
-        AuthResolver,
         { provide: AuthService, useValue: mockAuthService },
-        { provide: UserService, useValue: {} }, // pas utilisé ici
       ],
     }).compile();
 
-    resolver = module.get<AuthResolver>(AuthResolver);
-    authService = module.get<AuthService>(AuthService);
+    controller = module.get<AuthController>(AuthController);
+    service = module.get<AuthService>(AuthService);
+
+    jest.clearAllMocks();
   });
 
   it('should return Google Auth URL', async () => {
-    const url = await resolver.getGoogleAuthUrl();
-    expect(url).toBe('https://auth.google.com/redirect');
-    expect(authService.getGoogleAuthUrl).toHaveBeenCalled();
+    const payload = { redirectUri: 'http://localhost/callback' };
+    const result = await controller.getGoogleAuthUrl(payload, mockContext as any);
+    expect(result).toBe('https://auth.google.com/redirect');
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(service.getGoogleAuthUrl).toHaveBeenCalled();
   });
 
   it('should handle Google callback', async () => {
-    const result = await resolver.handleGoogleCallback('test-code', 'user123');
-    expect(result).toBe(true);
-    expect(authService.handleGoogleCallback).toHaveBeenCalledWith('test-code', 'user123');
+    const payload = { code: 'test-code', userId: 'user123' };
+    const result = await controller.handleGoogleCallBack(payload, mockContext as any);
+    expect(result).toEqual({ success: true });
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(service.handleGoogleCallBack).toHaveBeenCalledWith('test-code', 'user123');
   });
 
   it('should return access token and Google auth URL on login', async () => {
-    const result = await resolver.login('test@example.com', 'password123');
+    const payload = { email: 'test@example.com', password: 'password123' };
+    const result = await controller.login(payload, mockContext as any);
     expect(result).toEqual({
       access_token: 'abc123',
       google_auth_url: 'https://auth.google.com/redirect',
     });
-    expect(authService.login).toHaveBeenCalledWith({
-      email: 'test@example.com',
-      password: 'password123',
-    });
+    expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    expect(service.login).toHaveBeenCalledWith('test@example.com', 'password123');
   });
 });

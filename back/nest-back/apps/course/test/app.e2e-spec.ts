@@ -1,15 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AppCourseModule } from '../src/app.module';
 
-jest.setTimeout(30000);
-
-describe('E2E All controllers', () => {
+describe('GraphQL Integration (Course, Chapter, Lesson)', () => {
   let app: INestApplication;
-  let courseId: number;
-  let chapterId: number;
-  let lessonId: number;
+  let courseId: string;
+  let chapterId: string;
+  let lessonId: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -24,108 +22,183 @@ describe('E2E All controllers', () => {
     await app.close();
   });
 
-  // COURSES
-  it('POST /course - create course', async () => {
+  // --- COURSE CRUD ---
+
+  it('should create a course', async () => {
+    const mutation = `
+      mutation CreateCourse($input: CreateCourseInput!) {
+        createCourse(createCourseInput: $input) {
+          id
+          title
+          level
+          status
+          createdAt
+        }
+      }
+    `;
+    const variables = {
+      input: {
+        title: "Integration Test Course",
+        level: "beginner",
+        status: "draft",
+      }
+    };
     const res = await request(app.getHttpServer())
-      .post('/course')
-      .send({
-        user_id: 1,
-        title: 'Test Course',
-        level: 'beginner',
-        status: 'draft',
-      });
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id');
-    courseId = res.body.id;
+      .post('/graphql')
+      .send({ query: mutation, variables });
+    expect(res.body.data.createCourse).toHaveProperty('id');
+    courseId = res.body.data.createCourse.id;
   });
 
-  it('GET /course/:id - get course', async () => {
-    const res = await request(app.getHttpServer()).get(`/course/${courseId}`);
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('id', courseId);
+  it('should fetch course by id', async () => {
+    const query = `
+      query GetCourse($id: String!) {
+        course(id: $id) { id title level status createdAt }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query, variables: { id: courseId }});
+    expect(res.body.data.course).toHaveProperty('id', courseId);
   });
 
-  it('PATCH /course/:id - update course', async () => {
+  it('should update a course', async () => {
+    const mutation = `
+      mutation UpdateCourse($id: String!, $input: UpdateCourseInput!) {
+        updateCourse(id: $id, updateCourseInput: $input) { id title }
+      }
+    `;
+    const variables = { id: courseId, input: { title: "Updated Course Title" }};
     const res = await request(app.getHttpServer())
-      .patch(`/course/${courseId}`)
-      .send({ title: 'Updated Course' });
-    expect(res.status).toBe(200);
-    expect(res.body.title).toBe('Updated Course');
+      .post('/graphql')
+      .send({ query: mutation, variables });
+    expect(res.body.data.updateCourse.title).toBe("Updated Course Title");
   });
 
-  // CHAPTERS
-  it('POST /chapter - create chapter', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/chapter')
-      .send({
-        course_id: courseId, 
-        title: 'Test chapter',
+  it('should list all courses', async () => {
+    const query = `query { courses { id title } }`;
+    const res = await request(app.getHttpServer()).post('/graphql').send({ query });
+    expect(res.body.data.courses).toEqual(
+      expect.arrayContaining([{ id: courseId, title: "Updated Course Title" }])
+    );
+  });
+
+  // --- CHAPTER CRUD ---
+
+  it('should create a chapter', async () => {
+    const mutation = `
+      mutation CreateChapter($input: CreateChapterInput!) {
+        createChapter(createChapterInput: $input) { id title courseId position }
+      }
+    `;
+    const variables = {
+      input: {
+        courseId,
+        title: "Chapitre Intégration",
         position: 1,
-      });
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id');
-    chapterId = res.body.id;
-  });
-
-  it('GET /chapter/:id - get chapter', async () => {
-    const res = await request(app.getHttpServer()).get(`/chapter/${chapterId}`);
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('id', chapterId);
-  });
-
-  it('PATCH /chapter/:id - update chapter', async () => {
+      }
+    };
     const res = await request(app.getHttpServer())
-      .patch(`/chapter/${chapterId}`)
-      .send({ title: 'Updated chapter' });
-    expect(res.status).toBe(200);
-    expect(res.body.title).toBe('Updated chapter');
+      .post('/graphql')
+      .send({ query: mutation, variables });
+    expect(res.body.data.createChapter).toHaveProperty('id');
+    chapterId = res.body.data.createChapter.id;
   });
 
-  // LESSONS
-  it('POST /lesson - create lesson', async () => {
+  it('should fetch chapter by id', async () => {
+    const query = `
+      query GetChapter($id: String!) {
+        chapter(id: $id) { id title courseId position }
+      }
+    `;
     const res = await request(app.getHttpServer())
-      .post('/lesson')
-      .send({
-        chapter_id: chapterId, 
-        title: 'Test lesson',
-        content_markdown: 'Some content',
+      .post('/graphql')
+      .send({ query, variables: { id: chapterId }});
+    expect(res.body.data.chapter).toHaveProperty('id', chapterId);
+  });
+
+  it('should list chapters by courseId', async () => {
+    const query = `
+      query GetChaptersByCourseId($courseId: String!) {
+        chaptersByCourseId(courseId: $courseId) { id title }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query, variables: { courseId }});
+    expect(res.body.data.chaptersByCourseId).toEqual(
+      expect.arrayContaining([{ id: chapterId, title: "Chapitre Intégration" }])
+    );
+  });
+
+  // --- LESSON CRUD ---
+
+  it('should create a lesson', async () => {
+    const mutation = `
+      mutation CreateLesson($input: CreateLessonInput!) {
+        createLesson(createLessonInput: $input) { id title chapterId position contentMarkdown }
+      }
+    `;
+    const variables = {
+      input: {
+        chapterId,
+        title: "Leçon Test",
         position: 1,
-      });
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id');
-    lessonId = res.body.id;
-  });
-
-  it('GET /lesson/:id - get lesson', async () => {
-    const res = await request(app.getHttpServer()).get(`/lesson/${lessonId}`);
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('id', lessonId);
-  });
-
-  it('PATCH /lesson/:id - update lesson', async () => {
+        contentMarkdown: "Ceci est le contenu de la leçon."
+      }
+    };
     const res = await request(app.getHttpServer())
-      .patch(`/lesson/${lessonId}`)
-      .send({ title: 'Updated lesson' });
-    expect(res.status).toBe(200);
-    expect(res.body.title).toBe('Updated lesson');
+      .post('/graphql')
+      .send({ query: mutation, variables });
+    expect(res.body.data.createLesson).toHaveProperty('id');
+    lessonId = res.body.data.createLesson.id;
   });
 
-  // CLEANUP
-  it('DELETE /lesson/:id - delete lesson', async () => {
-    const res = await request(app.getHttpServer()).delete(`/lesson/${lessonId}`);
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ deleted: true });
+  it('should fetch lesson by id', async () => {
+    const query = `
+      query GetLesson($id: String!) {
+        lesson(id: $id) { id title chapterId contentMarkdown }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query, variables: { id: lessonId }});
+    expect(res.body.data.lesson).toHaveProperty('id', lessonId);
   });
 
-  it('DELETE /chapter/:id - delete chapter', async () => {
-    const res = await request(app.getHttpServer()).delete(`/chapter/${chapterId}`);
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ deleted: true });
+  it('should list lessons by chapter', async () => {
+    const query = `
+      query LessonsByChapter($chapterId: String!) {
+        lessonsByChapter(chapterId: $chapterId) { id title }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query, variables: { chapterId }});
+    expect(res.body.data.lessonsByChapter).toEqual(
+      expect.arrayContaining([{ id: lessonId, title: "Leçon Test" }])
+    );
   });
 
-  it('DELETE /course/:id - delete course', async () => {
-    const res = await request(app.getHttpServer()).delete(`/course/${courseId}`);
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ deleted: true });
+  // --- ERRORS & EDGES ---
+
+  it('should return error on non-existent course', async () => {
+    const query = `query { course(id: "doesnotexist") { id } }`;
+    const res = await request(app.getHttpServer()).post('/graphql').send({ query });
+    expect(res.body.errors).toBeDefined();
   });
+
+  it('should return error on non-existent chapter', async () => {
+    const query = `query { chapter(id: "doesnotexist") { id } }`;
+    const res = await request(app.getHttpServer()).post('/graphql').send({ query });
+    expect(res.body.errors).toBeDefined();
+  });
+
+  it('should return error on non-existent lesson', async () => {
+    const query = `query { lesson(id: "doesnotexist") { id } }`;
+    const res = await request(app.getHttpServer()).post('/graphql').send({ query });
+    expect(res.body.errors).toBeDefined();
+  });
+
+  
 });

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ChapterService } from './chapter.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Chapter } from '../../../../libs/database/src/entities/chapter.entity';
+import { CourseType } from '../../../../libs/database/src/entities/course.entity';
 import { Repository } from 'typeorm';
 import { LessonService } from '../lesson/lesson.service';
 
@@ -17,8 +18,8 @@ describe('ChapterService', () => {
     level: 2,
     status: 'finish',
     createdAt: new Date('12/11/2024'),
-    type: 'online',
-    sujet: 'informatique'
+    sujet: 'informatique',
+    type: CourseType.code ,
   };
 
   const mockChapter: Chapter = {
