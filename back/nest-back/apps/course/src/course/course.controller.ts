@@ -22,8 +22,9 @@ export class CourseController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
+            channel.ack(originalMsg);
             // Handle error, possibly with a dead-letter queue
-            throw error;
+            return error;
         }
     }
 
@@ -36,7 +37,8 @@ export class CourseController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            throw error;
+            channel.ack(originalMsg);
+            return error;
         }
     }
 
@@ -49,7 +51,8 @@ export class CourseController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            throw error;
+            channel.ack(originalMsg);
+            return error;
         }
     }
 
@@ -62,7 +65,8 @@ export class CourseController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            throw error;
+            channel.ack(originalMsg);
+            return error;
         }
     }
 
@@ -75,7 +79,8 @@ export class CourseController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            throw error;
+            channel.ack(originalMsg);
+            return error;
         }
     }
 
@@ -98,6 +103,7 @@ export class CourseController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
+            channel.ack(originalMsg);
             return error;
         }
     }

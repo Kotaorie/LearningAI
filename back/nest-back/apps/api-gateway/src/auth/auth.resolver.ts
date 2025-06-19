@@ -17,6 +17,9 @@ export class AuthResolver {
         @Context() context: any,
     ): Promise<boolean> {
         const result = await firstValueFrom(this.userClient.send('auth.handleGoogleCallBack',{code, userId: context.req.user.sub}));
+        if (!result || !result.success) {
+            throw new Error('Échec de la connexion avec Google');
+        }
         return result.success;
     }
 
@@ -26,6 +29,9 @@ export class AuthResolver {
         @Args('password') password: string,
     ): Promise<any> {
         const user = await firstValueFrom(this.userClient.send('auth.login', { email, password }));
+        if (!user || !user.access_token) {
+            throw new Error('Identifiants invalides');
+        }
         return {
             access_token: user.access_token,
             google_auth_url: user.google_auth_url,

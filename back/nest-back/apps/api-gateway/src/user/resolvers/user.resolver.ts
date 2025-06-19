@@ -32,9 +32,12 @@ export class UserResolver {
         @Args('updateUserInput') updateUserInput: UpdateUserInput,
         @Context() context: any
     ): Promise<User> {
-        const updatedUser = await firstValueFrom(this.userClient.send('user.update',{ updateUserInput, userId: context.req.user.sub}));
-        if (!updatedUser) {
-            throw new Error(`User with id ${updateUserInput.id} not found`);
+        if(!context.req.user || !context.req.user.sub) {
+            throw new Error('User not authenticated');
+        }
+        const updatedUser = await firstValueFrom(this.userClient.send('user.update',{ updateUserInput, id: context.req.user.sub}));
+        if (!updatedUser ) {
+            throw new Error(`User with id ${context.req.user.sub } not found`);
         }
         return updatedUser;
     }

@@ -120,10 +120,7 @@ export class CourseService {
       lessonDeleted  = await this.lessonService.deleteByChapterId(chapter.id);
       chapterDeleted = await this.chapterService.delete(chapter.id);
     }
-    console.log('chapters deleted', chapterDeleted);
-    console.log('lessons deleted', lessonDeleted);
     const result = await this.courseRepository.delete(id);
-    console.log('course deleted', result);
     if (result.affected === undefined || result.affected === null || result.affected === 0) {
       throw new Error(`Course with ID ${id} not found`);
     }

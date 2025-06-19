@@ -96,7 +96,6 @@ input UpdateUserInput {
   email: String
   firstName: String
   googleTokens: String
-  id: String!
   lastName: String
   level: Float
   password_hash: String

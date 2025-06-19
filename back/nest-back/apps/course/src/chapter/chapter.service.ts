@@ -21,6 +21,9 @@ export class ChapterService {
   }
 
   async findById(id: string): Promise<Chapter | null> {
+    if (!id) {
+      throw new Error('Chapter ID is required');
+    }
     return this.chapterRepository.findOne({ where: { id: id as any }, relations: ['lessons'] }); 
   }
 

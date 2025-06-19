@@ -18,7 +18,7 @@ export class ChapterController {
         } catch (error) {
             channel.ack(originalMsg);
             // Handle error, possibly with a dead-letter queue
-            throw error;
+            return error;
         }
     }
 
@@ -32,7 +32,7 @@ export class ChapterController {
             return result;
         } catch (error) {
             channel.ack(originalMsg);
-            throw error;
+            return error;
         }
     }
 
@@ -46,7 +46,7 @@ export class ChapterController {
             return result;
         } catch (error) {
             channel.ack(originalMsg);
-            throw error;
+            return error;
         }
     }
 
@@ -60,7 +60,7 @@ export class ChapterController {
             return result;
         } catch (error) {
             channel.ack(originalMsg);
-            throw error;
+            return error;
         }
     }
 
@@ -74,7 +74,7 @@ export class ChapterController {
             return result;
         } catch (error) {
             channel.ack(originalMsg);
-            throw error;
+            return error;
         }
     }
 }

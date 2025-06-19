@@ -13,7 +13,8 @@ export class ChapterResolver {
         @Args('id') id: string,
     ): Promise<Chapter> {
         const chapter = await firstValueFrom(this.courseClient.send('chapter.findById', { id }));
-        if (!chapter) {
+        console.log('chapter', chapter);
+        if (!chapter || Object.keys(chapter).length === 0) {
             throw new Error(`Chapter with id ${id} not found`);
         }
         return chapter;

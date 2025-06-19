@@ -15,8 +15,8 @@ export class AuthController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            // Optionally handle DLQ here
-            throw error;
+            channel.ack(originalMsg);
+            return error;
         }
     }
 
@@ -32,7 +32,8 @@ export class AuthController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            throw error;
+            channel.ack(originalMsg);
+            return error;
         }
     }
 
@@ -45,7 +46,8 @@ export class AuthController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            throw error;
+            channel.ack(originalMsg);
+            return error;
         }
     }
 }

@@ -17,7 +17,7 @@ export class UserController {
             return result;
         } catch (error) {
             // Optionally handle DLQ here
-            throw error;
+            return error;
         }
     }
 
@@ -30,7 +30,7 @@ export class UserController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            throw error;
+            return error;
         }
     }
 
@@ -43,20 +43,22 @@ export class UserController {
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            throw error;
+            return error;
         }
     }
 
     @MessagePattern('user.update')
-    async updateUser(@Payload() payload: Partial<User>, @Ctx() context: RmqContext) {
+    async updateUser(@Payload() payload: {updateUserInput: Partial<User>, id: string}, @Ctx() context: RmqContext) {
+        const {updateUserInput, id} = payload;
+        const data = { ...updateUserInput, id };
         const channel = context.getChannelRef();
         const originalMsg = context.getMessage();
         try {
-            const result = await this.userService.update(payload);
+            const result = await this.userService.update(data);
             channel.ack(originalMsg);
             return result;
         } catch (error) {
-            throw error;
+            return error;
         }
     }
 
@@ -69,7 +71,7 @@ export class UserController {
             channel.ack(originalMsg);
             return { deleted: result };
         } catch (error) {
-            throw error;
+            return error;
         }
     }
 }
