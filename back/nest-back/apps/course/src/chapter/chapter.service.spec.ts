@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChapterService } from './chapter.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Chapter } from './chapter.entity';
+import { Chapter } from '../../../../libs/database/src/entities/chapter.entity';
 import { Repository } from 'typeorm';
 
 describe('ChapterService', () => {

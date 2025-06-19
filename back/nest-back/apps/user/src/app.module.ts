@@ -4,19 +4,18 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { User } from '../../../libs/database/src/entities/user.entity';
 import { DatabaseModule } from '../../../libs/database/src/database.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { GraphqlModule } from '../../../libs/graphql/src/graphql.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    GraphqlModule,
     DatabaseModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'jpp_secret',
+      signOptions: { expiresIn: '1d' },
+    }),
     TypeOrmModule.forFeature([User]),
     UserModule,
     AuthModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+  ]
 })
-export class AppModule {}
+export class AppUserModule {}

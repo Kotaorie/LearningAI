@@ -14,7 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       frontend-image: ${{ steps.meta-frontend.outputs.tags }}
-      backend-image: ${{ steps.meta-backend.outputs.tags }}
+      user-image: ${{ steps.meta-user.outputs.tags }}
+      course-image: ${{ steps.meta-course.outputs.tags }}
+      schedule-image: ${{ steps.meta-schedule.outputs.tags }}
+      api-gateway-image: ${{ steps.meta-apigateway.outputs.tags }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,7 +32,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build Frontend
       - name: Extract metadata for frontend
         id: meta-frontend
         uses: docker/metadata-action@v5
@@ -49,23 +51,83 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Build Backend
-      - name: Extract metadata for backend
-        id: meta-backend
+      ## Build User Microservice
+      - name: Extract metadata for user microservice
+        id: meta-user
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/user
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-
 
-      - name: Build and push backend
+      - name: Build and push user microservice
         uses: docker/build-push-action@v5
         with:
-          context: ./back/nest-back
-          file: ./back/nest-back/Dockerfile
+          context: ./back/nest-back/apps/user
+          file: ./back/nest-back/Dockerfile.user
           push: true
-          tags: ${{ steps.meta-backend.outputs.tags }}
+          tags: ${{ steps.meta-user.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      ## Build Course Microservice
+      - name: Extract metadata for course microservice
+        id: meta-course
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/course
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push course microservice
+        uses: docker/build-push-action@v5
+        with:
+          context: ./back/nest-back/apps/course
+          file: ./back/nest-back/Dockerfile.course
+          push: true
+          tags: ${{ steps.meta-course.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      ## Build Schedule Microservice
+      - name: Extract metadata for schedule microservice
+        id: meta-schedule
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/schedule
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push schedule microservice
+        uses: docker/build-push-action@v5
+        with:
+          context: ./back/nest-back/apps/schedule
+          file: ./back/nest-back/Dockerfile.schedule
+          push: true
+          tags: ${{ steps.meta-schedule.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      ## Build API Gateway Microservice
+      - name: Extract metadata for api-gateway microservice
+        id: meta-apigateway
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/api-gateway
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push api-gateway microservice
+        uses: docker/build-push-action@v5
+        with:
+          context: ./back/nest-back/apps/api-gateway
+          file: ./back/nest-back/Dockerfile.api
+          push: true
+          tags: ${{ steps.meta-apigateway.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -95,10 +157,18 @@ jobs:
             
             # Variables d'environnement pour les images
             export FRONTEND_IMAGE=$(echo "${{ needs.build.outputs.frontend-image }}" | head -n1)
-            export BACKEND_IMAGE=$(echo "${{ needs.build.outputs.backend-image }}" | head -n1)
+            export USER_IMAGE=$(echo "${{ needs.build.outputs.user-image }}" | head -n1)
+            export COURSE_IMAGE=$(echo "${{ needs.build.outputs.course-image }}" | head -n1)
+            export SCHEDULE_IMAGE=$(echo "${{ needs.build.outputs.schedule-image }}" | head -n1)
+            export API_GATEWAY_IMAGE=$(echo "${{ needs.build.outputs.api-gateway-image }}" | head -n1)
+
             
             echo "Frontend image: $FRONTEND_IMAGE"
-            echo "Backend image: $BACKEND_IMAGE"
+            echo "User image: $USER_IMAGE"
+            echo "Course image: $COURSE_IMAGE"
+            echo "Schedule image: $SCHEDULE_IMAGE"
+            echo "API Gateway image: $API_GATEWAY_IMAGE"
+
             
             # Déploiement
             docker compose down

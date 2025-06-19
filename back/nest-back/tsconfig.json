@@ -18,6 +18,12 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@libs/ai": [
+        "libs/ai/src"
+      ],
+      "@libs/ai/*": [
+        "libs/ai/src/*"
+      ],
       "@libs/database": [
         "libs/database/src"
       ],

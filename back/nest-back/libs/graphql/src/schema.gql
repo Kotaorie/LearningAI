@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AuthResponse {
+  access_token: String!
+  google_auth_url: String!
+}
+
 type Chapter {
   courseId: String!
   id: String!
@@ -16,36 +21,27 @@ type Course {
   id: String!
   level: Float!
   status: String!
+  sujet: String!
   title: String!
+  type: String!
   userId: String!
-}
-
-input CreateChapterInput {
-  courseId: String!
-  position: Float!
-  title: String!
 }
 
 input CreateCourseInput {
   level: Float!
   status: String!
+  sujet: String!
   title: String!
-  userId: String!
+  type: String!
 }
 
-input CreateLessonInput {
-  chapterId: String!
-  contentMarkdown: String!
-  position: Float!
-  title: String!
-}
-
-input CreateQuizzInput {
-  chapterId: String!
-  courseId: String!
-  createdAt: DateTime!
-  questionsJson: String!
-  title: String!
+input CreateUserInput {
+  email: String!
+  firstName: String!
+  googleTokens: String
+  lastName: String!
+  level: Float!
+  password_hash: String!
 }
 
 """
@@ -62,18 +58,15 @@ type Lesson {
 }
 
 type Mutation {
-  createChapter(createChapterInput: CreateChapterInput!): Chapter!
   createCourse(createCourseInput: CreateCourseInput!): Course!
-  createLesson(createLessonInput: CreateLessonInput!): Lesson!
-  createQuizz(CreateQuizzInput: CreateQuizzInput!): Quizz!
-  deleteChapter(id: String!): Boolean!
+  createUser(createUserInput: CreateUserInput!): User!
   deleteCourse(id: String!): Boolean!
-  deleteLesson(id: String!): Boolean!
-  deleteQuizz(id: String!): Boolean!
-  updateChapter(id: String!, updateChapterInput: CreateChapterInput!): Chapter!
-  updateCourse(id: String!, updateCourseInput: CreateCourseInput!): Course!
-  updateLesson(id: String!, updateLessonInput: CreateLessonInput!): Lesson!
-  updateQuizz(id: String!, updateLessonInput: CreateQuizzInput!): Quizz!
+  deleteSchedule(id: String!): Boolean!
+  deleteUser: Boolean!
+  generateChapter(chapterId: String!, id: String!): Chapter!
+  handleGoogleCallback(code: String!): Boolean!
+  login(email: String!, password: String!): AuthResponse!
+  updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
 type Query {
@@ -83,15 +76,37 @@ type Query {
   courses: [Course!]!
   lesson(id: String!): Lesson!
   lessonsByChapter(chapterId: String!): [Lesson!]!
-  quizz(id: String!): Quizz!
-  quizzesByChapter(chapterId: String!): [Quizz!]!
+  schedule(id: String!): Schedule!
+  schedulesByUser: [Schedule!]!
+  user: User!
 }
 
-type Quizz {
-  chapterId: String!
+type Schedule {
   courseId: String!
-  createdAt: DateTime!
+  courseName: String!
+  days: [String!]!
+  durationWeeks: Float!
+  hoursPerSession: Float!
   id: String!
-  questionsJson: String!
-  title: String!
+  startDate: String!
+  userId: String!
+}
+
+input UpdateUserInput {
+  email: String
+  firstName: String
+  googleTokens: String
+  lastName: String
+  level: Float
+  password_hash: String
+}
+
+type User {
+  email: String!
+  firstName: String!
+  googleTokens: String
+  id: String!
+  lastName: String!
+  level: Float!
+  password_hash: String!
 }
