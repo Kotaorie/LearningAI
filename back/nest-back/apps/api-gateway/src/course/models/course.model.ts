@@ -14,6 +14,12 @@ export class Course {
   title: string;
 
   @Field()
+  type: string;
+
+  @Field()
+  sujet: string;
+
+  @Field()
   level: number;
 
   @Field()
@@ -28,11 +34,15 @@ export class Course {
 
 @InputType()
 export class CreateCourseInput {
-  @Field()
-  userId: string;
   
   @Field()
   title: string;
+
+  @Field()
+  type: string;
+
+  @Field()
+  sujet: string;
 
   @Field()
   level: number;

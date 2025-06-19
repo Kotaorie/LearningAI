@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AuthResponse {
+  access_token: String!
+  google_auth_url: String!
+}
+
 type Chapter {
   courseId: String!
   id: String!
@@ -16,38 +21,18 @@ type Course {
   id: String!
   level: Float!
   status: String!
+  sujet: String!
   title: String!
+  type: String!
   userId: String!
-}
-
-input CreateChapterInput {
-  courseId: String!
-  position: Float!
-  title: String!
 }
 
 input CreateCourseInput {
   level: Float!
   status: String!
+  sujet: String!
   title: String!
-  userId: String!
-}
-
-input CreateLessonInput {
-  chapterId: String!
-  contentMarkdown: String!
-  position: Float!
-  title: String!
-}
-
-input CreateScheduleInput {
-  courseId: String!
-  courseName: String!
-  days: [String!]!
-  durationWeeks: Float!
-  hoursPerSession: Float!
-  startDate: String!
-  userId: String!
+  type: String!
 }
 
 input CreateUserInput {
@@ -73,22 +58,14 @@ type Lesson {
 }
 
 type Mutation {
-  createChapter(createChapterInput: CreateChapterInput!): Chapter!
   createCourse(createCourseInput: CreateCourseInput!): Course!
-  createLesson(createLessonInput: CreateLessonInput!): Lesson!
-  createSchedule(createScheduleInput: CreateScheduleInput!): Schedule!
   createUser(createUserInput: CreateUserInput!): User!
-  deleteChapter(id: String!): Boolean!
   deleteCourse(id: String!): Boolean!
-  deleteLesson(id: String!): Boolean!
   deleteSchedule(id: String!): Boolean!
-  deleteUser(id: String!): Boolean!
-  handleGoogleCallback(code: String!, userId: String!): Boolean!
-  login(email: String!, password: String!): String!
-  updateChapter(id: String!, updateChapterInput: CreateChapterInput!): Chapter!
-  updateCourse(id: String!, updateCourseInput: CreateCourseInput!): Course!
-  updateLesson(id: String!, updateLessonInput: CreateLessonInput!): Lesson!
-  updateSchedule(id: String!, updateScheduleInput: CreateScheduleInput!): Schedule!
+  deleteUser: Boolean!
+  generateChapter(chapterId: String!, id: String!): Chapter!
+  handleGoogleCallback(code: String!): Boolean!
+  login(email: String!, password: String!): AuthResponse!
   updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
@@ -97,13 +74,11 @@ type Query {
   chaptersByCourseId(courseId: String!): [Chapter!]!
   course(id: String!): Course!
   courses: [Course!]!
-  getGoogleAuthUrl: String!
   lesson(id: String!): Lesson!
   lessonsByChapter(chapterId: String!): [Lesson!]!
   schedule(id: String!): Schedule!
-  schedulesByUser(userId: String!): [Schedule!]!
-  user(id: String!): User!
-  userByEmail(email: String!): User!
+  schedulesByUser: [Schedule!]!
+  user: User!
 }
 
 type Schedule {
@@ -121,7 +96,6 @@ input UpdateUserInput {
   email: String
   firstName: String
   googleTokens: String
-  id: String!
   lastName: String
   level: Float
   password_hash: String

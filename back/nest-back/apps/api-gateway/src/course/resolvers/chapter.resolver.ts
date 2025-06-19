@@ -8,19 +8,13 @@ import { firstValueFrom } from 'rxjs';
 export class ChapterResolver {
     constructor(@Inject('COURSE_SERVICE') private readonly courseClient: ClientProxy) {}
 
-    @Mutation(() => Chapter)
-    async createChapter(
-        @Args('createChapterInput') createChapterInput: CreateChapterInput,
-    ): Promise<Chapter> {
-        return await firstValueFrom(this.courseClient.send('chapter.create', createChapterInput));
-    }
-
     @Query(() => Chapter, { name: 'chapter' })
     async getChapter(
         @Args('id') id: string,
     ): Promise<Chapter> {
         const chapter = await firstValueFrom(this.courseClient.send('chapter.findById', { id }));
-        if (!chapter) {
+        console.log('chapter', chapter);
+        if (!chapter || Object.keys(chapter).length === 0) {
             throw new Error(`Chapter with id ${id} not found`);
         }
         return chapter;
@@ -29,23 +23,5 @@ export class ChapterResolver {
     @Query(() => [Chapter], { name: 'chaptersByCourseId' })
     async getChapters(@Args('courseId') courseId: string): Promise<Chapter[]> {
         return firstValueFrom(this.courseClient.send('chapter.findByCourseId', { courseId }));
-    }
-
-    @Mutation(() => Chapter)
-    async updateChapter(
-        @Args('id') id: string,
-        @Args('updateChapterInput') updateChapterInput: CreateChapterInput,
-    ): Promise<Chapter> {
-        const updatedChapter = await firstValueFrom(this.courseClient.send('chapter.update', { id, updateChapterInput }));
-        if (!updatedChapter) {
-            throw new Error(`Chapter with id ${id} not found`);
-        }
-        return updatedChapter;
-    }
-
-    @Mutation(() => Boolean)
-    async deleteChapter(@Args('id') id: string): Promise<boolean> {
-        const result = await firstValueFrom(this.courseClient.send('chapter.delete', { id }));
-        return result.deleted; 
     }
 }

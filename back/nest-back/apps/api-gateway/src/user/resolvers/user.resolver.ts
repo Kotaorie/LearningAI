@@ -1,8 +1,9 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { Inject } from '@nestjs/common';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Inject, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { User, CreateUserInput, UpdateUserInput } from '../models/user.model';
 import { firstValueFrom } from 'rxjs';
+import { AuthGuard } from '../../auth/guards/auth.guard';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -16,37 +17,35 @@ export class UserResolver {
     }
 
     @Query(() => User, { name: 'user' })
-    async getUser(@Args('id', { type: () => String }) id: string): Promise<User> {
-        const user = await firstValueFrom(this.userClient.send('user.findById', {id}));
+    @UseGuards(AuthGuard)
+    async getUser(@Context() context: any): Promise<User> {
+        const user = await firstValueFrom(this.userClient.send('user.findById', {userId: context.req.user.sub}));
         if (!user) {
-            throw new Error(`User with id ${id} not found`);
-        }
-        return user;
-    }
-
-    @Query(() => User, { name: 'userByEmail' })
-    async getUserByEmail(@Args('email', { type: () => String }) email: string): Promise<User> {
-        const user = await firstValueFrom(this.userClient.send('user.findByEmail', { email }));
-        if (!user) {
-            throw new Error(`User with email ${email} not found`);
+            throw new Error(`User with id ${context.req.user.sub} not found`);
         }
         return user;
     }
 
     @Mutation(() => User)
+    @UseGuards(AuthGuard)
     async updateUser(
         @Args('updateUserInput') updateUserInput: UpdateUserInput,
+        @Context() context: any
     ): Promise<User> {
-        const updatedUser = await firstValueFrom(this.userClient.send('user.update', updateUserInput));
-        if (!updatedUser) {
-            throw new Error(`User with id ${updateUserInput.id} not found`);
+        if(!context.req.user || !context.req.user.sub) {
+            throw new Error('User not authenticated');
+        }
+        const updatedUser = await firstValueFrom(this.userClient.send('user.update',{ updateUserInput, id: context.req.user.sub}));
+        if (!updatedUser ) {
+            throw new Error(`User with id ${context.req.user.sub } not found`);
         }
         return updatedUser;
     }
 
     @Mutation(() => Boolean)
-    async deleteUser(@Args('id', { type: () => String }) id: string): Promise<boolean> {
-        const result = await firstValueFrom(this.userClient.send('user.delete', { id }));
+    @UseGuards(AuthGuard)
+    async deleteUser(@Context() context: any): Promise<boolean> {
+        const result = await firstValueFrom(this.userClient.send('user.delete', { userId: context.req.user.sub }));
         return result.deleted;
     }
 }
