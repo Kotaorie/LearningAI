@@ -22,6 +22,11 @@ LearningAI est une plateforme web d'apprentissage assisté par IA. Elle génère
 ```bash
 git clone https://github.com/Kotaorie/LearningAI.git
 cd LearningAI
+npm i
+cd '.\back\nest-back\'
+npm i
+
+
 ```
 
 3. **Modifier les env.test**
@@ -35,9 +40,12 @@ POSTGRES_DB=learning-ai-db
 JWT_SECRET=jpp_secret
 ```
 
-2. **Lancer les services avec Docker**
+2. **Lancer les services avec Docker et npm**
 ```bash
-docker-compose -f compose.dev.yaml up --build
+cd LearningAI
+docker-compose -f compose.dev2.yaml up --build
+cd .\back\nest-back\
+npm run start:dev
 ```
 
 Accès :
