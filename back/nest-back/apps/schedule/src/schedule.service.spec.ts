@@ -4,12 +4,10 @@ import { Schedule } from '../../../libs/database/src/entities/schedule.entity';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { GoogleCalendarService } from '../../../libs/google-calendar/src/google-calendar.service';
-import { UserService } from '../../user/src/user/user.service';
 
 describe('ScheduleService', () => {
   let service: ScheduleService;
   let repo: Repository<Schedule>;
-  let userService: UserService;
   let googleCalendarService: GoogleCalendarService;
 
   const mockSchedule: Schedule = {
@@ -52,13 +50,11 @@ describe('ScheduleService', () => {
         ScheduleService,
         { provide: getRepositoryToken(Schedule), useValue: mockRepo },
         { provide: GoogleCalendarService, useValue: mockGoogleCalendarService },
-        { provide: UserService, useValue: mockUserService },
       ],
     }).compile();
 
     service = module.get<ScheduleService>(ScheduleService);
     repo = module.get<Repository<Schedule>>(getRepositoryToken(Schedule));
-    userService = module.get<UserService>(UserService);
     googleCalendarService = module.get<GoogleCalendarService>(GoogleCalendarService);
   });
 
@@ -77,7 +73,6 @@ describe('ScheduleService', () => {
     expect(result).toEqual(mockSchedule);
     expect(repo.create).toHaveBeenCalledWith(input);
     expect(repo.save).toHaveBeenCalled();
-    expect(userService.findById).toHaveBeenCalledWith('4');
     expect(googleCalendarService.addEvent).toHaveBeenCalled();
   });
 

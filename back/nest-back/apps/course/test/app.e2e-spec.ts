@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
+import { AppCourseModule } from '../src/app.module';
 
 jest.setTimeout(30000);
 
@@ -13,7 +13,7 @@ describe('E2E All controllers', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppCourseModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
