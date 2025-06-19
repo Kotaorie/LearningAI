@@ -4,6 +4,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { Course, CreateCourseInput } from '../models/course.model';
 import { firstValueFrom } from 'rxjs';
 import { AuthGuard } from '../../auth/guards/auth.guard';
+import { Chapter } from '../models/chapter.model';
 
 @Resolver(() => Course)
 export class CourseResolver {
@@ -32,6 +33,15 @@ export class CourseResolver {
             throw new Error(`Course with id ${id} not found`);
         }
         return {...course, createdAt: new Date(course.createdAt),};
+    }
+
+    @Mutation(() => Chapter)
+    async generateChapter(@Args('id') id: string, @Args('chapterId') chapterId: string): Promise<Chapter> {
+        const chapter = await firstValueFrom(this.courseClient.send('course.generateChapter', { id, chapterId }));
+        if (!chapter) {
+            throw new Error(`Chapter with id ${id} not found`);
+        }
+        return chapter;
     }
 
     @Mutation(() => Boolean)

@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chapter } from '../../../../libs/database/src/entities/chapter.entity';
+import { LessonService } from '../lesson/lesson.service';
 
 @Injectable()
 export class ChapterService {
-  constructor(@InjectRepository(Chapter) private chapterRepository: Repository<Chapter>){}
+  constructor(
+    @InjectRepository(Chapter) private chapterRepository: Repository<Chapter>,
+    private readonly lessonService: LessonService,
+  ){}
 
   async create(data: Partial<Chapter>): Promise<Chapter> {
     const chapter = this.chapterRepository.create(data);
@@ -26,24 +30,40 @@ export class ChapterService {
       order: { position: 'ASC' },
       relations: ['lessons'],
     });
-}
-async update(id: string, data: Partial<Chapter>): Promise<Chapter> {
-  await this.chapterRepository.update(id, data);
-  const updated = await this.findById(id);
-
-  if (!updated) {
-    throw new Error(`Chapter with ID ${id} not found`);
   }
 
-  return updated;
-}
-
-async delete(id: string): Promise<{ deleted: boolean }> {
-  const result = await this.chapterRepository.delete(id);
-  if (result.affected === undefined || result.affected === null || result.affected === 0) {
-    throw new Error(`Chapter with ID ${id} not found`);
+  async generate(id:string, courseTitle: string): Promise<Chapter> {
+    const chapter = await this.findById(id);
+    if (!chapter) {
+      throw new Error(`Chapter with ID ${id} not found`);
+    }
+    const lessons = chapter.lessons;
+    if (!lessons) {
+      throw new Error(`Chapter with ID ${id} has no lessons to generate`);
+    }
+    for (const lesson of lessons) {
+      await this.lessonService.generate(lesson.id, courseTitle);
+    }
+    const chapterUpdated = await this.findById(id);
+    return chapterUpdated ? chapterUpdated : chapter;
   }
-  return { deleted: result.affected > 0  };
-}
+ 
+  async update(id: string, data: Partial<Chapter>): Promise<Chapter> {
+    await this.chapterRepository.update(id, data);
+    const updated = await this.findById(id);
+    if (!updated) {
+      throw new Error(`Chapter with ID ${id} not found`);
+    }
+
+    return updated;
+  }
+
+  async delete(id: string): Promise<{ deleted: boolean }> {
+    const result = await this.chapterRepository.delete(id);
+    if (result.affected === undefined || result.affected === null || result.affected === 0) {
+      throw new Error(`Chapter with ID ${id} not found`);
+    }
+    return { deleted: result.affected > 0  };
+  }
 
 }

@@ -7,19 +7,19 @@ import { Lesson } from '../../../../libs/database/src/entities/lesson.entity';
 export class LessonController {
     constructor(private readonly lessonService: LessonService) {}
 
-    @MessagePattern('lesson.create')
-    async createLesson(@Payload() payload: Partial<Lesson>, @Ctx() context: RmqContext) {
-        const channel = context.getChannelRef();
-        const originalMsg = context.getMessage();
-        try {
-            const result = await this.lessonService.create(payload);
-            channel.ack(originalMsg);
-            return result;
-        } catch (error) {
-            // Handle error, possibly with a dead-letter queue
-            throw error;
-        }
-    }
+    // @MessagePattern('lesson.create')
+    // async createLesson(@Payload() payload: Partial<Lesson>, @Ctx() context: RmqContext) {
+    //     const channel = context.getChannelRef();
+    //     const originalMsg = context.getMessage();
+    //     try {
+    //         const result = await this.lessonService.create(payload);
+    //         channel.ack(originalMsg);
+    //         return result;
+    //     } catch (error) {
+    //         // Handle error, possibly with a dead-letter queue
+    //         throw error;
+    //     }
+    // }
 
     @MessagePattern('lesson.findById')
     async getLesson(@Payload() payload: { id: string }, @Ctx() context: RmqContext) {

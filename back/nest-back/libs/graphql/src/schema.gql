@@ -58,6 +58,7 @@ type Mutation {
   deleteCourse(id: String!): Boolean!
   deleteSchedule(id: String!): Boolean!
   deleteUser: Boolean!
+  generateChapter(chapterId: String!, id: String!): Chapter!
   handleGoogleCallback(code: String!): Boolean!
   login(email: String!, password: String!): String!
   updateUser(updateUserInput: UpdateUserInput!): User!

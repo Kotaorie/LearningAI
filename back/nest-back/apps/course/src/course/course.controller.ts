@@ -53,6 +53,19 @@ export class CourseController {
         }
     }
 
+    @MessagePattern('course.generateChapter')
+    async generateChapter(@Payload() payload: { id: string; chapterId: string }, @Ctx() context: RmqContext) {
+        const channel = context.getChannelRef();
+        const originalMsg = context.getMessage();
+        try {
+            const result = await this.courseService.generateChapter(payload.id, payload.chapterId);
+            channel.ack(originalMsg);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     @MessagePattern('course.update')
     async updateCourse(@Payload() payload: { id: string; updateCourseInput: Partial<Course> }, @Ctx() context: RmqContext) {
         const channel = context.getChannelRef();
