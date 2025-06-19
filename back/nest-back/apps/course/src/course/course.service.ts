@@ -39,8 +39,6 @@ export class CourseService {
     if(!data.sujet || !data.title) {
       throw new Error('Sujet is required to create a course');
     }
-    const course = this.courseRepository.create(data);
-    const coursSave = await this.courseRepository.save(course);
     const chapitreRegex = /\*\*Chapitre\s(\d)\s:\s(.*?)\*\*/g;
     const leconRegex = /\*\*Leçon\s(\d\.\d)\s:\s(.*?)\*\*/g;
     let chapitreMatch: any;
@@ -57,7 +55,8 @@ export class CourseService {
       const chapitreNumber = code.split('.')[0];
       lessons.push({ code, title, chapitreNumber });
     }
-
+    const course = this.courseRepository.create(data);
+    const coursSave = await this.courseRepository.save(course);
     for (const chapitre of chapitres) {
       const chapterData = {
         courseId: coursSave.id,
@@ -78,7 +77,11 @@ export class CourseService {
         await this.chapterService.generate(createdChapter.id, data.title);
       }
     }
-    return coursSave
+    const cours = await this.findById(coursSave.id);
+    if (!cours) {
+      throw new Error(`Course with ID ${coursSave.id} not found after creation`);
+    }
+    return cours;
   }
 
   async generateChapter(id: string, chapterId: string): Promise<any> {
@@ -95,7 +98,7 @@ export class CourseService {
   }
 
   async findAll(): Promise<Course[]> {
-    return this.courseRepository.find();
+    return this.courseRepository.find({ relations: ['chapters', 'chapters.lessons'] });
   }
 
   async findById(id: string): Promise<Course | null> {
