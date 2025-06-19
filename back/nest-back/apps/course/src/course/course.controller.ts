@@ -82,12 +82,10 @@ export class CourseController {
 
     @MessagePattern('course.delete')
     async deleteCourse(@Payload() payload: { id: string, userId: string }, @Ctx() context: RmqContext) {
-        console.log('Deleting course with payload:', payload);
         const channel = context.getChannelRef();
         const originalMsg = context.getMessage();
         try {
             const course = await this.courseService.findById(payload.id);
-            console.log('Course to delete:', course);
             if (!course) {
                 channel.ack(originalMsg);
                 throw new NotFoundException('Course not found');

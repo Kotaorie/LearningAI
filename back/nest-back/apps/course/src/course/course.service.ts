@@ -102,23 +102,32 @@ export class CourseService {
     return this.courseRepository.findOne({ where: { id: id as any }, relations: ['chapters', 'chapters.lessons'] });
   }
 
- async update(id: string, data: Partial<Course>): Promise<Course> {
-  await this.courseRepository.update(id, data);
-  const updated = await this.findById(id);
-  if (!updated) {
-    throw new Error(`Course with ID ${id} not found`);
+  async update(id: string, data: Partial<Course>): Promise<Course> {
+    await this.courseRepository.update(id, data);
+    const updated = await this.findById(id);
+    if (!updated) {
+      throw new Error(`Course with ID ${id} not found`);
+    }
+    return updated;
   }
-  return updated;
-}
 
 
   async delete(id: string): Promise<{deleted: boolean}> {
+    const chapters = await this.chapterService.findByCourseId(id);
+    var chapterDeleted = {};
+    var lessonDeleted = {};
+    for (const chapter of chapters) {
+      lessonDeleted  = await this.lessonService.deleteByChapterId(chapter.id);
+      chapterDeleted = await this.chapterService.delete(chapter.id);
+    }
+    console.log('chapters deleted', chapterDeleted);
+    console.log('lessons deleted', lessonDeleted);
     const result = await this.courseRepository.delete(id);
+    console.log('course deleted', result);
     if (result.affected === undefined || result.affected === null || result.affected === 0) {
       throw new Error(`Course with ID ${id} not found`);
     }
     return { deleted: result.affected > 0 };
   }
 
-  //
 }

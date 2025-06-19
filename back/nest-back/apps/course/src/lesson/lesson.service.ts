@@ -69,6 +69,15 @@ export class LessonService {
   
     return updated;
   }
+
+  async deleteByChapterId(chapterId: string): Promise<{ deleted: boolean }> {
+    const result = await this.lessonRepository.delete({ chapterId: chapterId });
+    if (result.affected === undefined || result.affected === null) {
+      const errorMsg = `Delete operation did not return an affected count; no lessons deleted for chapterId: ${chapterId}`;
+      throw new Error(errorMsg);
+    }
+    return { deleted: result.affected > 0  };
+  }
   
   async delete(id: string): Promise<{ deleted: boolean }> {
     const result = await this.lessonRepository.delete(id);

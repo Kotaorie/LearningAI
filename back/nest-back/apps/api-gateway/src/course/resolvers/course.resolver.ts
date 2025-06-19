@@ -48,7 +48,7 @@ export class CourseResolver {
     @UseGuards(AuthGuard)
     async deleteCourse(@Args('id') id: string,  @Context() context: any): Promise<boolean> {
         const result = await firstValueFrom(this.courseClient.send('course.delete', { id,userId: context.req.user.sub }));
-        if (result.response.error) {
+        if (result.deleted === false) {
             throw new Error(`Failed to delete course with id ${id}: ${result.response.message}`);
         }
         return result?.deleted ?? false;
