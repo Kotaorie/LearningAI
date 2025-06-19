@@ -18,7 +18,7 @@
     "build:schedule": "nest build apps/schedule",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "concurrently \"ts-node apps/api-gateway/src/main.ts --watch\" \"ts-node apps/user/src/main.ts --watch\" \"ts-node apps/course/src/main.ts --watch\" \"ts-node apps/schedule/src/main.ts --watch\"",
     "start:debug": "nest start --debug --watch",
     "start:prod": "typeorm-ts-node-commonjs migration:run -d libs/database/src/data-source.ts && node dist/main.js",
     "start:user": "ts-node apps/user/src/main.ts --watch",
