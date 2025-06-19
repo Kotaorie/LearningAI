@@ -139,10 +139,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: delete old images
-        run: |
-          docker system prune -af --volumes
-
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
         with:

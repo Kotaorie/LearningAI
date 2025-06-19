@@ -10,7 +10,6 @@ import { Chapter } from '../../../libs/database/src/entities/chapter.entity';
 import { CourseModule } from './course/course.module';
 import { ChapterModule } from './chapter/chapter.module';
 import { LessonModule } from './lesson/lesson.module';
-import { QuizzModule } from './quizz/quizz.module';
 
 @Module({
   imports: [
@@ -19,7 +18,6 @@ import { QuizzModule } from './quizz/quizz.module';
     CourseModule,
     ChapterModule,
     LessonModule,
-    QuizzModule,
   ],
 })
 export class AppCourseModule {}
