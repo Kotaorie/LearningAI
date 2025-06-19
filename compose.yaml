@@ -17,13 +17,13 @@ services:
   api-gateway:
     image: ${API_GATEWAY_IMAGE:-ghcr.io/kotaorie/learningai/api-gateway:staging}
     ports:
-      - "3000:3000"
+      - "3001:3001"
     networks:
       - app_network
     restart: unless-stopped
 
-  user-service:
-    image: ${BACKEND_IMAGE:-ghcr.io/kotaorie/learningai/backend:staging}
+  user:
+    image: ${USER_IMAGE:-ghcr.io/kotaorie/learningai/user:staging}
     depends_on:
       postgres-db:
         condition: service_healthy
@@ -38,8 +38,8 @@ services:
       - app_network
     restart: unless-stopped
 
-  course-service:
-    image: ${COURSE_SERVICE_IMAGE:-ghcr.io/kotaorie/learningai/course-service:staging}
+  course:
+    image: ${COURSE_IMAGE:-ghcr.io/kotaorie/learningai/course:staging}
     depends_on:
       postgres-db:
         condition: service_healthy
@@ -54,8 +54,8 @@ services:
       - app_network
     restart: unless-stopped
   
-  schedule-service:
-    image: ${SCHEDULE_SERVICE_IMAGE:-ghcr.io/kotaorie/learningai/schedule-service:staging}
+  schedule:
+    image: ${SCHEDULE_IMAGE:-ghcr.io/kotaorie/learningai/schedule:staging}
     depends_on:
       postgres-db:
         condition: service_healthy
@@ -77,8 +77,6 @@ services:
     networks:
       - app_network
     restart: unless-stopped
-    depends_on:
-      - user-service
 
   postgres-db:
     image: postgres:15-alpine
