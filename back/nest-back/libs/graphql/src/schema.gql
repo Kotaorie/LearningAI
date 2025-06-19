@@ -1,0 +1,112 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthResponse {
+  access_token: String!
+  google_auth_url: String!
+}
+
+type Chapter {
+  courseId: String!
+  id: String!
+  lessons: [Lesson!]
+  position: Float!
+  title: String!
+}
+
+type Course {
+  chapters: [Chapter!]
+  createdAt: DateTime!
+  id: String!
+  level: Float!
+  status: String!
+  sujet: String!
+  title: String!
+  type: String!
+  userId: String!
+}
+
+input CreateCourseInput {
+  level: Float!
+  status: String!
+  sujet: String!
+  title: String!
+  type: String!
+}
+
+input CreateUserInput {
+  email: String!
+  firstName: String!
+  googleTokens: String
+  lastName: String!
+  level: Float!
+  password_hash: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Lesson {
+  chapterId: String!
+  contentMarkdown: String!
+  id: String!
+  position: Float!
+  title: String!
+}
+
+type Mutation {
+  createCourse(createCourseInput: CreateCourseInput!): Course!
+  createUser(createUserInput: CreateUserInput!): User!
+  deleteCourse(id: String!): Boolean!
+  deleteSchedule(id: String!): Boolean!
+  deleteUser: Boolean!
+  generateChapter(chapterId: String!, id: String!): Chapter!
+  handleGoogleCallback(code: String!): Boolean!
+  login(email: String!, password: String!): AuthResponse!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type Query {
+  chapter(id: String!): Chapter!
+  chaptersByCourseId(courseId: String!): [Chapter!]!
+  course(id: String!): Course!
+  courses: [Course!]!
+  lesson(id: String!): Lesson!
+  lessonsByChapter(chapterId: String!): [Lesson!]!
+  schedule(id: String!): Schedule!
+  schedulesByUser: [Schedule!]!
+  user: User!
+}
+
+type Schedule {
+  courseId: String!
+  courseName: String!
+  days: [String!]!
+  durationWeeks: Float!
+  hoursPerSession: Float!
+  id: String!
+  startDate: String!
+  userId: String!
+}
+
+input UpdateUserInput {
+  email: String
+  firstName: String
+  googleTokens: String
+  lastName: String
+  level: Float
+  password_hash: String
+}
+
+type User {
+  email: String!
+  firstName: String!
+  googleTokens: String
+  id: String!
+  lastName: String!
+  level: Float!
+  password_hash: String!
+}
