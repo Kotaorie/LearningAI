@@ -48,9 +48,6 @@ export class CreateUserInput {
 
 @InputType()
 export class UpdateUserInput {
-    @Field()
-    id: string;
-
     @Field({ nullable: true })
     email?: string;
 

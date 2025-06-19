@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { DatabaseService } from './database.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 
@@ -26,7 +25,6 @@ import { ConfigModule } from '@nestjs/config';
       }),
     }),
   ],
-  providers: [DatabaseService],
-  exports: [DatabaseService, TypeOrmModule],
+  exports: [TypeOrmModule],
 })
 export class DatabaseModule {}

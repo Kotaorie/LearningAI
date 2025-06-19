@@ -1,9 +1,9 @@
-import { GoogleCalendarService } from '../../../libs/google-calendar/src/google-calendar.service';
-import { Schedule } from '../../../libs/database/src/entities/schedule.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserService } from '../../user/src/user/user.service';
+import { GoogleCalendarService } from '../../../libs/google-calendar/src/google-calendar.service';
+import { Schedule } from '../../../libs/database/src/entities/schedule.entity';
+import { User } from '../../../libs/database/src/entities/user.entity';
 
 
 
@@ -11,10 +11,15 @@ import { UserService } from '../../user/src/user/user.service';
 export class ScheduleService {
   constructor(
     @InjectRepository(Schedule)
-    private scheduleRepository: Repository<Schedule>,
+    private readonly scheduleRepository: Repository<Schedule>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private googleCalendarService: GoogleCalendarService,
-    private userService: UserService,
   ) {}
+
+  async getUserById(userId: string): Promise<any> {
+    return this.userRepository.findOne({ where: { id: userId } });
+  }
 
   async createSchedule(schedule: Partial<Schedule>): Promise<Schedule> {
     if (!schedule.userId) {

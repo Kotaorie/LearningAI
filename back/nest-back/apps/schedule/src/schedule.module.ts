@@ -3,20 +3,18 @@ import { ScheduleService } from './schedule.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Schedule } from '../../../libs/database/src/entities/schedule.entity';
 import { GoogleCalendarModule } from '../../../libs/google-calendar/src/google-calendar.module';
-import { UserModule } from '../../user/src/user/user.module';
-import { GraphqlModule } from '../../../libs/graphql/src/graphql.module';
 import { DatabaseModule } from '../../../libs/database/src/database.module';
-import { ScheduleResolver } from './schedule.resolver';
+import { ScheduleController } from './schedule.controller';
+import { User } from '../../../libs/database/src/entities/user.entity';
 
 @Module({
   imports: [
-    GraphqlModule,
     DatabaseModule,
-    TypeOrmModule.forFeature([Schedule]),
+    TypeOrmModule.forFeature([Schedule, User]),
     GoogleCalendarModule,
-    UserModule,
   ],
-  providers: [ScheduleService, ScheduleResolver],
+  controllers: [ScheduleController],
+  providers: [ScheduleService],
   exports: [ScheduleService],
 })
 export class ScheduleModule {}
